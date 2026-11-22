@@ -1,9 +1,9 @@
-const CACHE_NAME = 'inspection-workspace-v3';
+const CACHE_NAME = 'inspection-workspace-v4';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
   '/daily-report.html',
-  '/pwa-bridge.js?v=3',
+  '/pwa-bridge.js?v=4',
   '/pwa-bridge.js',
   '/manifest.json',
   '/icon.svg'

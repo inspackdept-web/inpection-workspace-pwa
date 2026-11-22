@@ -88,6 +88,125 @@
   //    - Tablet (Mode Landscape) & PC / Desktop
   // ===========================================================================
   const RESPONSIVE_CSS = `
+    /* -------- LEGEND KOMPLIT & 3 KARTU RINGKASAN KALENDER (SEMUA LAYAR) -------- */
+    .cal-legend-complete {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px 18px;
+      margin: 14px 0 12px;
+      padding: 4px 6px;
+      color: #607783;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .cal-leg-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .cal-leg-box {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border-radius: 4.5px;
+      flex: none;
+    }
+    .cal-leg-box.leg-green {
+      background: #e3f5eb;
+      border: 1.5px solid #80c7a5;
+    }
+    .cal-leg-box.leg-red {
+      background: #fde8e8;
+      border: 1.5px solid #e99b9b;
+    }
+    .cal-leg-box.leg-empty {
+      background: #f8fbfa;
+      border: 1.5px solid #dce7e5;
+    }
+    .cal-leg-box.leg-selected {
+      background: #eaf4f8;
+      border: 2px solid #137c9b;
+    }
+    .cal-leg-box.leg-today {
+      background: #ffffff;
+      border: 2px solid #239879;
+    }
+
+    /* Highlight Hari Ini & Dipilih pada Kalender */
+    .calendar-day.is-today,
+    .input-calendar-day.is-today {
+      box-shadow: inset 0 0 0 2px #239879 !important;
+    }
+    .calendar-day.is-selected,
+    .input-calendar-day.is-selected {
+      box-shadow: inset 0 0 0 2.2px #137c9b, 0 4px 12px rgba(19, 124, 155, 0.22) !important;
+      border-color: #137c9b !important;
+    }
+
+    /* 3 Kartu Ringkasan Kalender (HARI TERISI | BELUM TERISI | TOTAL DATA) */
+    .cal-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 0 0 12px;
+      width: 100%;
+    }
+    .cal-sum-card {
+      background: #f2faf6;
+      border: 1px solid #d7ece3;
+      border-radius: 13px;
+      padding: 13px 10px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+    .cal-sum-card strong {
+      font-size: 21px;
+      font-weight: 850;
+      color: #092b3a;
+      line-height: 1.15;
+      font-variant-numeric: tabular-nums;
+    }
+    .cal-sum-card small {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: #607783;
+      text-transform: uppercase;
+    }
+
+    /* HP Mode Vertikal (Portrait): Grafik Success Rate per Shift & Average per Line Muat Penuh Tanpa Geser Kanan */
+    @media (max-width: 600px) and (orientation: portrait) {
+      .bar-chart-wrap {
+        min-height: 0 !important;
+        overflow-x: hidden !important;
+      }
+      .bar-chart-wrap svg {
+        min-width: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+      }
+      .cal-legend-complete {
+        gap: 8px 12px;
+        font-size: 11px;
+      }
+      .cal-sum-card {
+        padding: 10px 6px;
+      }
+      .cal-sum-card strong {
+        font-size: 18px;
+      }
+      .cal-sum-card small {
+        font-size: 9px;
+      }
+    }
+
     /* Default (Desktop & Tablet Landscape): Sembunyikan Floating Bottom Nav */
     .pwa-floating-dock,
     .pwa-popup-menu,

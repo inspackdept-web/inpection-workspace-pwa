@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Inspection Workspace">
   <meta name="theme-color" content="#092b3a">
-  <script src="/pwa-bridge.js?v=3"></script>
+  <script src="/pwa-bridge.js?v=4"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Inspection Workspace — Daily Report &amp; Success Rate</title>
@@ -466,7 +466,18 @@
             <div class="control"><label for="inputMonth">Pilih Bulan</label><input id="inputMonth" type="month"></div>
           </div>
           <div id="inputCalendar" class="calendar-grid"><div class="loading">Memuat kalender…</div></div>
-          <div class="calendar-legend"><span class="calendar-check">✓</span> Data hari tersebut sudah tersimpan</div>
+          <div class="cal-legend-complete">
+            <span class="cal-leg-item"><i class="cal-leg-box leg-green"></i>Success Rate ≥ 95%</span>
+            <span class="cal-leg-item"><i class="cal-leg-box leg-red"></i>Success Rate &lt; 95%</span>
+            <span class="cal-leg-item"><i class="cal-leg-box leg-empty"></i>Belum ada data</span>
+            <span class="cal-leg-item"><i class="cal-leg-box leg-selected"></i>Dipilih</span>
+            <span class="cal-leg-item"><i class="cal-leg-box leg-today"></i>Hari ini</span>
+          </div>
+          <div id="inputCalendarSummary" class="cal-summary-cards">
+            <div class="cal-sum-card"><strong id="inputSumFilled">0</strong><small>HARI TERISI</small></div>
+            <div class="cal-sum-card"><strong id="inputSumEmpty">0</strong><small>BELUM TERISI</small></div>
+            <div class="cal-sum-card"><strong id="inputSumTotal">0</strong><small>TOTAL DATA</small></div>
+          </div>
           <div class="note">Untuk tanggal yang dipilih, aplikasi hanya membaca sheet dengan nama nomor tanggal tersebut. Contoh: tanggal 26 akan membaca sheet <b>26</b>. Sel input kosong dihitung sebagai 0.</div>
           <div id="inputStatus" class="status" aria-live="polite"></div>
         </section>
@@ -479,7 +490,18 @@
             <div class="calendar-head-actions"><div class="control"><label for="historyMonth">Pilih Bulan</label><input id="historyMonth" type="month"></div><button id="exportMonthExcelButton" class="button button-primary" type="button">📊 Export Excel (1 Bulan)</button><button id="printMonthButton" class="button button-secondary" type="button">Cetak Bulan</button></div>
           </div>
           <div id="historyCalendar" class="calendar-grid"><div class="loading">Memuat kalender…</div></div>
-          <div class="calendar-legend"><span class="calendar-check">✓</span> Data hari tersebut sudah tersimpan</div>
+          <div class="cal-legend-complete">
+            <span class="cal-leg-item"><i class="cal-leg-box leg-green"></i>Success Rate ≥ 95%</span>
+            <span class="cal-leg-item"><i class="cal-leg-box leg-red"></i>Success Rate &lt; 95%</span>
+            <span class="cal-leg-item"><i class="cal-leg-box leg-empty"></i>Belum ada data</span>
+            <span class="cal-leg-item"><i class="cal-leg-box leg-selected"></i>Dipilih</span>
+            <span class="cal-leg-item"><i class="cal-leg-box leg-today"></i>Hari ini</span>
+          </div>
+          <div id="historyCalendarSummary" class="cal-summary-cards">
+            <div class="cal-sum-card"><strong id="historySumFilled">0</strong><small>HARI TERISI</small></div>
+            <div class="cal-sum-card"><strong id="historySumEmpty">0</strong><small>BELUM TERISI</small></div>
+            <div class="cal-sum-card"><strong id="historySumTotal">0</strong><small>TOTAL DATA</small></div>
+          </div>
           <div id="historyStatus" class="status" aria-live="polite"></div>
         </section>
       </section>
@@ -935,34 +957,59 @@
     function renderAnalysisBars(groups,mode,commentDate) {
       const target=$('shiftAnalysisChart');
       if(!groups.length){target.innerHTML='<div class="chart-empty">Belum ada data untuk grafik ini.</div>';return;}
-      const width=Math.max(mode==='line'?1200:700,target.clientWidth||900),height=370;
-      const margin={left:52,right:18,top:28,bottom:70};
+      const isPhonePortrait = window.innerWidth <= 600 && window.innerHeight > window.innerWidth;
+      const width = isPhonePortrait
+        ? Math.max(320, target.clientWidth || 340)
+        : Math.max(mode==='line'?1200:700, target.clientWidth||900);
+      const height = isPhonePortrait ? 275 : 370;
+      const margin = isPhonePortrait
+        ? {left:34, right:6, top:20, bottom:48}
+        : {left:52, right:18, top:28, bottom:70};
       const plotBottom=height-margin.bottom,plotTop=margin.top,plotHeight=plotBottom-plotTop;
       const innerWidth=width-margin.left-margin.right;
       const xFor=(index)=>margin.left+index*innerWidth/Math.max(1,groups.length);
       const yFor=(value)=>plotTop+(100-Math.max(75,Math.min(100,Number(value))))*plotHeight/25;
       let svg='<svg viewBox="0 0 '+width+' '+height+'" role="img" aria-label="Grafik batang success rate" preserveAspectRatio="none">';
-      [75,80,85,90,95,100].forEach((tick)=>{const yy=yFor(tick);svg+='<line x1="'+margin.left+'" y1="'+yy+'" x2="'+(width-margin.right)+'" y2="'+yy+'" stroke="#dce7e5" stroke-width="1"/><text x="'+(margin.left-9)+'" y="'+(yy+4)+'" text-anchor="end" fill="#70858d" font-size="10">'+tick+'%</text>';});
-      const targetY=yFor(95);svg+='<line x1="'+margin.left+'" y1="'+targetY+'" x2="'+(width-margin.right)+'" y2="'+targetY+'" stroke="#d14444" stroke-width="2" stroke-dasharray="7 5"/>';
+      const tickFontSize = isPhonePortrait ? '8' : '10';
+      [75,80,85,90,95,100].forEach((tick)=>{const yy=yFor(tick);svg+='<line x1="'+margin.left+'" y1="'+yy+'" x2="'+(width-margin.right)+'" y2="'+yy+'" stroke="#dce7e5" stroke-width="1"/><text x="'+(margin.left-5)+'" y="'+(yy+3)+'" text-anchor="end" fill="#70858d" font-size="'+tickFontSize+'">'+tick+'%</text>';});
+      const targetY=yFor(95);svg+='<line x1="'+margin.left+'" y1="'+targetY+'" x2="'+(width-margin.right)+'" y2="'+targetY+'" stroke="#d14444" stroke-width="'+(isPhonePortrait?'1.5':'2')+'" stroke-dasharray="6 4"/>';
       groups.forEach((group,groupIndex)=>{
-        const groupWidth=innerWidth/groups.length,bars=group.bars||[],gap=mode==='shift'?2:0;
-        const barWidth=mode==='shift'?Math.min(38,(groupWidth-10-gap*2)/3):Math.min(46,groupWidth*.29);
-        const commentWidth=mode==='line'?Math.min(112,groupWidth-barWidth-18):0;
+        const groupWidth=innerWidth/groups.length,bars=group.bars||[];
+        const gap = mode==='shift' ? (isPhonePortrait ? 1.5 : 2) : 0;
+        const barWidth = mode==='shift'
+          ? (isPhonePortrait ? Math.max(8, Math.min(14, (groupWidth-6-gap*2)/3)) : Math.min(38,(groupWidth-10-gap*2)/3))
+          : (isPhonePortrait ? Math.max(18, Math.min(28, groupWidth*0.52)) : Math.min(46,groupWidth*.29));
+        const commentWidth=(!isPhonePortrait && mode==='line')?Math.min(112,groupWidth-barWidth-18):0;
         const totalWidth=bars.length*barWidth+Math.max(0,bars.length-1)*gap;
         const startX=xFor(groupIndex)+(groupWidth-totalWidth)/2;
         bars.forEach((bar,barIndex)=>{
           const xx=startX+barIndex*(barWidth+gap),center=xx+barWidth/2,value=bar.value;
           if(value===null||typeof value==='undefined'||!Number.isFinite(Number(value))){
-            svg+='<text x="'+center+'" y="'+(plotBottom-8)+'" text-anchor="middle" fill="#82959a" font-size="9">—</text>';
+            svg+='<text x="'+center+'" y="'+(plotBottom-8)+'" text-anchor="middle" fill="#82959a" font-size="'+(isPhonePortrait?'7':'9')+'">—</text>';
           } else {
             const numeric=Math.max(0,Math.min(100,Number(value))),yy=yFor(numeric),barHeight=plotBottom-yy,delay=Math.min((groupIndex*bars.length+barIndex)*.035,.55).toFixed(2)+'s';
             const labelColor=numeric<95?'#c93636':'#16803c';
-            svg+='<rect class="bar-chart-bar" style="--bar-delay:'+delay+'" x="'+xx.toFixed(1)+'" y="'+yy.toFixed(1)+'" width="'+barWidth.toFixed(1)+'" height="'+Math.max(1,barHeight).toFixed(1)+'" rx="4" fill="'+bar.color+'"><title>'+escapeHtml(bar.title)+' · '+percent(numeric)+'</title></rect>';
-            const boxWidth=Math.max(25,Math.min(barWidth-4,48)),boxY=yy+Math.max(3,(barHeight-18)/2);
-            svg+='<rect class="bar-chart-value bar-chart-label-box" style="--bar-delay:'+delay+'" x="'+(center-boxWidth/2).toFixed(1)+'" y="'+boxY.toFixed(1)+'" width="'+boxWidth.toFixed(1)+'" height="18" rx="5" fill="#fff" fill-opacity=".96" stroke="#dfe9e6" stroke-width="1"/><text class="bar-chart-value" style="--bar-delay:'+delay+'" x="'+center.toFixed(1)+'" y="'+(boxY+12).toFixed(1)+'" text-anchor="middle" fill="'+labelColor+'" font-size="8" font-weight="800">'+percent(numeric)+'</text>';
+            const rx = isPhonePortrait ? '2.5' : '4';
+            svg+='<rect class="bar-chart-bar" style="--bar-delay:'+delay+'" x="'+xx.toFixed(1)+'" y="'+yy.toFixed(1)+'" width="'+barWidth.toFixed(1)+'" height="'+Math.max(1,barHeight).toFixed(1)+'" rx="'+rx+'" fill="'+bar.color+'"><title>'+escapeHtml(bar.title)+' · '+percent(numeric)+'</title></rect>';
+            if (isPhonePortrait && mode === 'shift') {
+              const shortPct = numeric.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+              const rotY = Math.min(plotBottom - 16, Math.max(plotTop + 16, yy + barHeight/2));
+              svg+='<text class="bar-chart-value" style="--bar-delay:'+delay+'" transform="translate('+center.toFixed(1)+' '+rotY.toFixed(1)+') rotate(-90)" text-anchor="middle" dominant-baseline="central" fill="'+labelColor+'" font-size="6.3" font-weight="800" paint-order="stroke" stroke="#ffffff" stroke-width="2.2">'+shortPct+'</text>';
+            } else if (isPhonePortrait && mode === 'line') {
+              const shortPct = numeric.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+              const boxW = Math.max(28, barWidth + 8), boxY = yy + Math.max(3, (barHeight-14)/2);
+              svg+='<rect class="bar-chart-value bar-chart-label-box" style="--bar-delay:'+delay+'" x="'+(center-boxW/2).toFixed(1)+'" y="'+boxY.toFixed(1)+'" width="'+boxW.toFixed(1)+'" height="14" rx="4" fill="#fff" fill-opacity=".96" stroke="#dfe9e6" stroke-width="0.8"/><text class="bar-chart-value" style="--bar-delay:'+delay+'" x="'+center.toFixed(1)+'" y="'+(boxY+9.8).toFixed(1)+'" text-anchor="middle" fill="'+labelColor+'" font-size="6.8" font-weight="800">'+shortPct+'</text>';
+            } else {
+              const boxWidth=Math.max(25,Math.min(barWidth-4,48)),boxY=yy+Math.max(3,(barHeight-18)/2);
+              svg+='<rect class="bar-chart-value bar-chart-label-box" style="--bar-delay:'+delay+'" x="'+(center-boxWidth/2).toFixed(1)+'" y="'+boxY.toFixed(1)+'" width="'+boxWidth.toFixed(1)+'" height="18" rx="5" fill="#fff" fill-opacity=".96" stroke="#dfe9e6" stroke-width="1"/><text class="bar-chart-value" style="--bar-delay:'+delay+'" x="'+center.toFixed(1)+'" y="'+(boxY+12).toFixed(1)+'" text-anchor="middle" fill="'+labelColor+'" font-size="8" font-weight="800">'+percent(numeric)+'</text>';
+            }
           }
-          if(mode==='shift')svg+='<text x="'+center.toFixed(1)+'" y="'+(plotBottom+17)+'" text-anchor="middle" fill="#70858d" font-size="8">'+escapeHtml(String(bar.label||'').replace(/^Shift\s*/i,''))+'</text>';
-          if(mode==='line'&&group.line){
+          if(mode==='shift'){
+            const sLbl = String(bar.label||'').replace(/^Shift\s*/i,'');
+            const dispLbl = isPhonePortrait ? sLbl.charAt(0) : sLbl;
+            svg+='<text x="'+center.toFixed(1)+'" y="'+(plotBottom+(isPhonePortrait?12:17))+'" text-anchor="middle" fill="#70858d" font-size="'+(isPhonePortrait?'6.8':'8')+'" font-weight="'+(isPhonePortrait?'700':'400')+'">'+escapeHtml(dispLbl)+'</text>';
+          }
+          if(!isPhonePortrait && mode==='line'&&group.line){
             const full=String(group.comment||'').replace(/\s+/g,' ').trim(),short=full.length>20?full.slice(0,19)+'…':full;
             const noteW=Math.max(52,commentWidth),noteH=28;
             const noteY=value===null||typeof value==='undefined'?plotTop+(plotHeight-noteH)/2:Math.max(plotTop+4,Math.min(plotBottom-noteH-4,(yFor(value)+plotBottom-noteH)/2));
@@ -971,7 +1018,7 @@
             if(full)svg+='<g class="bar-comment-callout" data-edit-comment="'+escapeHtml(commentDate||'')+'" data-edit-line="'+escapeHtml(group.line)+'" tabindex="0" role="button" aria-label="'+(full?'Edit':'Tambah')+' komentar Line '+escapeHtml(group.line)+'"><title>'+escapeHtml(full||('Tambah komentar Line '+group.line))+'</title><path d="'+noteTail+'" fill="#c7d9ff" stroke="#7899df" stroke-width="1"/><rect x="'+(noteX+2)+'" y="'+(noteY+3)+'" width="'+noteW+'" height="'+noteH+'" rx="8" fill="#7899df" opacity=".25"/><rect x="'+noteX+'" y="'+noteY+'" width="'+noteW+'" height="'+noteH+'" rx="8" fill="#c7d9ff" stroke="#7899df" stroke-width="1.1"/><text x="'+(noteX+noteW/2)+'" y="'+(noteY+17)+'" text-anchor="middle" fill="#274775" font-size="8" font-weight="700">'+escapeHtml(short)+'</text></g>';
           }
         });
-        svg+='<text'+(mode==='line'&&group.line?' class="analysis-line-label" data-edit-comment="'+escapeHtml(commentDate||'')+'" data-edit-line="'+escapeHtml(group.line)+'" tabindex="0" role="button" aria-label="Tambah atau edit komentar '+escapeHtml(group.label)+'"':'')+' x="'+(xFor(groupIndex)+groupWidth/2).toFixed(1)+'" y="'+(height-12)+'" text-anchor="middle" fill="#35545f" font-size="10" font-weight="800">'+escapeHtml(group.label)+'</text>';
+        svg+='<text'+(mode==='line'&&group.line?' class="analysis-line-label" data-edit-comment="'+escapeHtml(commentDate||'')+'" data-edit-line="'+escapeHtml(group.line)+'" tabindex="0" role="button" aria-label="Tambah atau edit komentar '+escapeHtml(group.label)+'"':'')+' x="'+(xFor(groupIndex)+groupWidth/2).toFixed(1)+'" y="'+(height-(isPhonePortrait?10:12))+'" text-anchor="middle" fill="#35545f" font-size="'+(isPhonePortrait?'8.5':'10')+'" font-weight="800">'+escapeHtml(group.label)+'</text>';
       });
       svg+='</svg>';
       target.innerHTML=svg;
@@ -1220,17 +1267,30 @@
     function renderCalendar(kind,data) {
       const target=$(kind+'Calendar');
       const firstDay=(new Date(data.year,data.month-1,1).getDay()+6)%7;
+      const now=new Date(),isThisMonth=now.getFullYear()===Number(data.year)&&now.getMonth()+1===Number(data.month),todayNum=now.getDate();
       let html=['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map((label)=>'<div class="weekday">'+label+'</div>').join('');
       for(let blank=0;blank<firstDay;blank++) html+='<div class="calendar-blank"></div>';
+      let filledDays=0,totalDataRows=0;
       for(let day=1;day<=data.daysInMonth;day++) {
         const record=data.uploads[String(day)],uploaded=Boolean(record),disabled=kind==='history'&&!uploaded;
         const rate=uploaded?Number(record.successRate)*100:null,belowTarget=uploaded&&rate<95;
-        html+='<button type="button" class="calendar-day'+(uploaded?' uploaded':'')+(belowTarget?' rate-below-target':'')+'" data-day="'+day+'"'+(disabled?' disabled':'')+' aria-label="Tanggal '+day+(uploaded?', data tersedia':', belum ada data')+'">'+
+        const isToday=isThisMonth&&day===todayNum;
+        if(uploaded){
+          filledDays++;
+          totalDataRows+=Number(record.detailRows)||23;
+        }
+        html+='<button type="button" class="calendar-day'+(uploaded?' uploaded':'')+(belowTarget?' rate-below-target':'')+(isToday?' is-today':'')+'" data-day="'+day+'"'+(disabled?' disabled':'')+' aria-label="Tanggal '+day+(uploaded?', data tersedia':', belum ada data')+'">'+
           '<span class="calendar-day-number">'+day+'</span>'+(uploaded?'<span class="calendar-check" aria-hidden="true">✓</span>':'')+
           '<span class="calendar-day-label">'+(uploaded?percent(rate): (kind==='input'?'Unggah data':'Kosong'))+'</span></button>';
       }
       target.innerHTML=html;
+      const emptyDays=Math.max(0,(Number(data.daysInMonth)||0)-filledDays);
+      if($(kind+'SumFilled')) $(kind+'SumFilled').textContent=numberFormat(filledDays);
+      if($(kind+'SumEmpty')) $(kind+'SumEmpty').textContent=numberFormat(emptyDays);
+      if($(kind+'SumTotal')) $(kind+'SumTotal').textContent=numberFormat(totalDataRows);
       target.querySelectorAll('button[data-day]').forEach((button)=>button.addEventListener('click',()=>{
+        target.querySelectorAll('button[data-day]').forEach((b)=>b.classList.remove('is-selected'));
+        button.classList.add('is-selected');
         const day=Number(button.dataset.day);
         if(kind==='input') openUploadDialog(day); else openHistoryDialog(day);
       }));
