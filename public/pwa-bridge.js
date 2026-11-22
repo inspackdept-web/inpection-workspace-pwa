@@ -445,6 +445,44 @@
         line-height: 1.3 !important;
       }
 
+      /* -------- PAGINATION HISTORI REPORT & DETAIL (HP VERTIKAL: MUAT PENUH & TIDAK KEPOTONG) -------- */
+      .detail-pagination,
+      #historyPagination {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-top: 12px !important;
+      }
+
+      .detail-page-info {
+        text-align: center !important;
+        width: 100% !important;
+        font-size: 11px !important;
+      }
+
+      .detail-pagination-pages {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      .detail-pagination button,
+      .detail-pagination-pages button {
+        padding: 6px 8px !important;
+        min-width: 28px !important;
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+        border-radius: 7px !important;
+        white-space: nowrap !important;
+      }
+
       /* -------- EFEK BLUR LAYAR UTAMA SAAT POP-UP AKTIF -------- */
       body.pwa-nav-blur #dailyWorkspaceContainer,
       body.pwa-nav-blur #successWorkspaceContainer {
