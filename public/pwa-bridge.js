@@ -277,14 +277,33 @@
 
       .control input,
       .control select,
+      .input-month-control input,
+      #inputCalendarMonth,
       input[type="date"],
       input[type="month"] {
         width: 100% !important;
         min-width: 0 !important;
         max-width: 100% !important;
+        height: 42px !important;
+        min-height: 42px !important;
         box-sizing: border-box !important;
-        font-size: 12.5px !important;
-        padding: 0 10px !important;
+        font-size: 13px !important;
+        padding: 0 12px !important;
+        border: 1px solid #dce7e5 !important;
+        border-radius: 10px !important;
+        background: #ffffff !important;
+        color: #102a37 !important;
+        box-shadow: 0 3px 12px #143d4808 !important;
+      }
+
+      .input-month-control label {
+        display: block !important;
+        margin-bottom: 5px !important;
+        color: #70858d !important;
+        font-size: 9px !important;
+        font-weight: 850 !important;
+        letter-spacing: 0.08em !important;
+        text-transform: uppercase !important;
       }
 
       #presentButton {
@@ -389,7 +408,41 @@
         width: 100% !important;
         min-width: 0 !important;
         max-width: 100% !important;
+        height: 42px !important;
+        min-height: 42px !important;
         box-sizing: border-box !important;
+      }
+
+      /* -------- TABEL HISTORI REPORT DAILY REPORT (HP VERTIKAL: GESER KANAN RAPI & JELAS) -------- */
+      .history-table-wrap,
+      .history-table-wrap .table-wrap {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        border-radius: 10px !important;
+      }
+
+      .history-table-wrap table {
+        width: 880px !important;
+        min-width: 880px !important;
+        table-layout: fixed !important;
+        font-size: 11.5px !important;
+      }
+
+      .history-table-wrap th,
+      .history-table-wrap td {
+        padding: 8px 6px !important;
+        font-size: 11px !important;
+        line-height: 1.35 !important;
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
+      }
+
+      .history-table-wrap th:nth-child(4),
+      .history-table-wrap th:nth-child(7),
+      .history-table-wrap td:nth-child(6) {
+        font-size: 10.5px !important;
+        line-height: 1.3 !important;
       }
 
       /* -------- EFEK BLUR LAYAR UTAMA SAAT POP-UP AKTIF -------- */
@@ -678,7 +731,7 @@
         { id: 'input',     icon: '⇧', label: 'Input Data' },
         { id: 'history',   icon: '▤', label: 'Histori Data' },
         { id: 'download',  icon: '⇩', label: 'Unduh Grafik' },
-        { id: 'html-urls', icon: '🔗', label: 'Alamat HTML' }
+        { id: 'urls',      icon: '🔗', label: 'Alamat HTML' }
       ]
     };
 
