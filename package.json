@@ -1,0 +1,9 @@
+{
+  "name": "inspection-workspace-pwa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Inspection Workspace PWA (Daily Report & Success Rate) — PT KCI",
+  "scripts": {
+    "sync": "powershell -ExecutionPolicy Bypass -File ./sync-from-gas.ps1"
+  }
+}

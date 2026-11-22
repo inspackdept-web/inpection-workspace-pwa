@@ -1,0 +1,19 @@
+{
+  "name": "Inspection Workspace",
+  "short_name": "Inspection Workspace",
+  "description": "Inspection Workspace — Daily Report & Success Rate Monitoring PT KCI",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#092b3a",
+  "theme_color": "#092b3a",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
