@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Inspection Workspace">
   <meta name="theme-color" content="#092b3a">
-  <script src="/pwa-bridge.js?v=8"></script>
+  <script src="/pwa-bridge.js?v=9"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Inspection Workspace — Daily Report &amp; Success Rate</title>
@@ -368,18 +368,59 @@
     .docx-shot-thumb { border:1px solid var(--line); border-radius:10px; overflow:hidden; background:#fff; }
     .docx-shot-thumb-head { padding:7px 10px; background:#f4f8f7; border-bottom:1px solid var(--line); font-size:11px; font-weight:750; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .docx-shot-thumb img { display:block; width:100%; height:135px; object-fit:contain; background:#e2e8f0; padding:4px; }
-    .hero-bottles { width:320px !important; max-width:52%; height:auto !important; flex:none; filter:drop-shadow(0 8px 14px rgba(4,24,34,.34)); }
-    @keyframes conveyorMoveRTL { 0% { transform:translateX(0px); } 100% { transform:translateX(-28px); } }
-    @keyframes beltTickRTL { 0% { stroke-dashoffset:0; } 100% { stroke-dashoffset:16; } }
-    @keyframes towerBlink { 0%,100% { opacity:.55; } 50% { opacity:1; } }
-    @keyframes scanPulse { 0%,100% { opacity:.25; } 50% { opacity:.9; } }
-    .bottles-track { animation:conveyorMoveRTL 1.4s linear infinite; }
-    .belt-dashes { animation:beltTickRTL .91s linear infinite; }
-    .tower-green { animation:towerBlink 1.8s ease-in-out infinite; }
-    .scan-beam { animation:scanPulse .9s ease-in-out infinite; }
-    .scan-beam-delay { animation:scanPulse .9s ease-in-out .45s infinite; }
-    @media (max-width:900px) { .hero-bottles { width:240px !important; } }
-    @media (max-width:650px) { .hero { flex-direction:column; align-items:flex-start; gap:14px; } .hero-bottles { width:100% !important; max-width:320px; } }
+    .hero-bottles { width:360px !important; max-width:56%; height:auto !important; flex:none; filter:drop-shadow(0 8px 16px rgba(4,18,28,.42)); }
+    .hero-controls-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:12px; }
+    .hero-pill-bar { display:inline-flex; align-items:center; gap:4px; padding:3px 5px 3px 11px; border-radius:999px; background:rgba(255,255,255,.11); border:1px solid rgba(255,255,255,.22); backdrop-filter:blur(6px); }
+    .hero-pill-label { font-size:9.5px; font-weight:850; letter-spacing:.09em; text-transform:uppercase; color:#b6e6dc; margin-right:4px; user-select:none; }
+    .hero-bottle-btn { display:inline-flex; align-items:center; gap:5px; height:24px; padding:0 10px; border:0; border-radius:999px; background:transparent; color:#e6f7f3; font-size:11px; font-weight:750; cursor:pointer; transition:all .16s ease; }
+    .hero-bottle-btn:hover:not(.active) { background:rgba(255,255,255,.12); color:#fff; }
+    .hero-bottle-btn.active { background:#ffffff; color:#092b3a; box-shadow:0 2px 7px rgba(4,22,32,.22); }
+    .hero-bottle-dot { width:8px; height:8px; border-radius:50%; flex:none; box-shadow:inset 0 1px 2px rgba(255,255,255,.65),0 1px 2px rgba(0,0,0,.25); }
+    .hero-bottle-dot.dot-green { background:radial-gradient(circle at 35% 35%,#4ade80,#15803d); }
+    .hero-bottle-dot.dot-amber { background:radial-gradient(circle at 35% 35%,#fbbf24,#b45309); }
+    .hero-bottle-dot.dot-flint { background:radial-gradient(circle at 35% 35%,#ffffff,#94a3b8); }
+    .hero-speed-pill { display:inline-flex; align-items:center; gap:7px; padding:3px 11px; height:32px; border-radius:999px; background:rgba(255,255,255,.11); border:1px solid rgba(255,255,255,.22); backdrop-filter:blur(6px); }
+    .hero-speed-slider { width:78px; height:4px; accent-color:#6dd1ae; cursor:pointer; margin:0; }
+    .hero-speed-val { font-size:11px; font-weight:850; color:#ffffff; font-variant-numeric:tabular-nums; min-width:28px; text-align:right; }
+    /* Animasi Mesin FP (Kontinu di In/Out Conveyor + Servo Step-and-Stop 6 Station di Dalam Turret) */
+    @keyframes bottleInfeedContinuous { 0% { transform:translateX(0px); } 100% { transform:translateX(-18px); } }
+    @keyframes turretDrumServo { 0%,57% { stroke-dashoffset:0; } 100% { stroke-dashoffset:14; } }
+    @keyframes fpRotaryServoOrbit3D {
+      0%,9.5%     { transform:translate(38px,0px) scale(.90); opacity:.88; }
+      13.1%       { transform:translate(32.9px,4.8px) scale(.98); opacity:.95; }
+      16.67%,26.17% { transform:translate(19px,8.2px) scale(1.05); opacity:1; }
+      29.75%      { transform:translate(0px,9.6px) scale(1.09); opacity:1; }
+      33.33%,42.83% { transform:translate(-19px,8.2px) scale(1.05); opacity:1; }
+      46.4%       { transform:translate(-32.9px,4.8px) scale(.98); opacity:.95; }
+      50.0%,59.5% { transform:translate(-38px,0px) scale(.90); opacity:.88; }
+      63.1%       { transform:translate(-32.9px,-4.2px) scale(.81); opacity:.55; }
+      66.67%,76.17% { transform:translate(-19px,-7px) scale(.75); opacity:.36; }
+      79.75%      { transform:translate(0px,-8.2px) scale(.72); opacity:.30; }
+      83.33%,92.83% { transform:translate(19px,-7px) scale(.75); opacity:.36; }
+      96.4%       { transform:translate(32.9px,-4.2px) scale(.81); opacity:.55; }
+      100%        { transform:translate(38px,0px) scale(.90); opacity:.88; }
+    }
+    @keyframes fpCoreGlow { 0%,100% { opacity:.82; transform:scale(.98); } 50% { opacity:1; transform:scale(1.04); } }
+    @keyframes fpRedStrobe1 { 0%,100% { opacity:1; } 30% { opacity:.45; } 60% { opacity:.95; } 80% { opacity:.35; } }
+    @keyframes fpRedStrobe2 { 0%,100% { opacity:.4; } 25% { opacity:1; } 55% { opacity:.5; } 85% { opacity:1; } }
+    @keyframes fpRedStrobe3 { 0%,100% { opacity:.9; } 45% { opacity:.3; } 75% { opacity:1; } }
+    @keyframes fpBeamScan { 0%,100% { opacity:.45; stroke-dashoffset:0; } 50% { opacity:1; stroke-dashoffset:-10; } }
+    .infeed-bottles { animation:bottleInfeedContinuous calc(var(--hero-speed,3.6s) / 6) linear infinite; }
+    .turret-drum-ticks { animation:turretDrumServo calc(var(--hero-speed,3.6s) / 6) cubic-bezier(.4,0,.2,1) infinite; }
+    .fp-station { transform-box:fill-box; transform-origin:center top; animation:fpRotaryServoOrbit3D var(--hero-speed,3.6s) ease-in-out infinite; }
+    .fp-st-1 { animation-delay:0s; }
+    .fp-st-2 { animation-delay:calc(var(--hero-speed,3.6s) * -0.16667); }
+    .fp-st-3 { animation-delay:calc(var(--hero-speed,3.6s) * -0.33333); }
+    .fp-st-4 { animation-delay:calc(var(--hero-speed,3.6s) * -0.50000); }
+    .fp-st-5 { animation-delay:calc(var(--hero-speed,3.6s) * -0.66667); }
+    .fp-st-6 { animation-delay:calc(var(--hero-speed,3.6s) * -0.83333); }
+    .fp-core-aura { transform-box:fill-box; transform-origin:center; animation:fpCoreGlow .9s ease-in-out infinite; }
+    .red-s1 { animation:fpRedStrobe1 .55s ease-in-out infinite; }
+    .red-s2 { animation:fpRedStrobe2 .65s ease-in-out infinite; }
+    .red-s3 { animation:fpRedStrobe3 .75s ease-in-out infinite; }
+    .red-beam { animation:fpBeamScan .6s linear infinite; }
+    @media (max-width:900px) { .hero-bottles { width:260px !important; } }
+    @media (max-width:650px) { .hero { flex-direction:column; align-items:flex-start; gap:14px; } .hero-bottles { width:100% !important; max-width:340px; } }
 </style>
 </head>
 <body>
@@ -417,9 +458,314 @@
       </header>
 
       <section id="page-dashboard" class="page active">
-        <section class="hero">
-          <div class="hero-copy"><div class="hero-tag">GLASS PRODUCTION · FOOD SAFETY</div><h2>Ringkasan Success Rate</h2><p>Bandingkan tingkat keberhasilan inspeksi harian pada setiap line dan pantau perubahan performanya.</p></div>
-          <svg class="hero-bottles" viewBox="0 0 460 215" fill="none" role="img" aria-label="Animasi botol amber melewati mesin MULTI 4 dan MCAL 4 dari kanan ke kiri"><defs><linearGradient id="srDash_cabYellow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFC414"/><stop offset="55%" stop-color="#F7AF00"/><stop offset="100%" stop-color="#E59800"/></linearGradient><linearGradient id="srDash_cabTop" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#FFCA28"/><stop offset="100%" stop-color="#F2A400"/></linearGradient><linearGradient id="srDash_bottleGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#B45309"/><stop offset="40%" stop-color="#F59E0B"/><stop offset="75%" stop-color="#92400E"/><stop offset="100%" stop-color="#662D07"/></linearGradient><clipPath id="srDash_clip"><rect x="6" y="106" width="448" height="44" rx="2"/></clipPath><g id="srDash_bottle"><ellipse cx="7" cy="36" rx="5.5" ry="1.6" fill="#06221A" opacity="0.45"/><path d="M5.2 4 H8.8 V10.5 C8.8 13.2 11.8 15.2 11.8 18.8 V33.8 C11.8 35.1 10.8 36 9.5 36 H4.5 C3.2 36 2.2 35.1 2.2 33.8 V18.8 C2.2 15.2 5.2 13.2 5.2 10.5 Z" fill="url(#srDash_bottleGrad)" stroke="#5C2805" stroke-width="0.65"/><rect x="4.6" y="3" width="4.8" height="1.8" rx="0.7" fill="url(#srDash_bottleGrad)" stroke="#5C2805" stroke-width="0.5"/><path d="M4.2 19.5 V32.2" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="1.2" stroke-linecap="round"/><path d="M6.1 6 V11" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="0.8" stroke-linecap="round"/></g></defs><ellipse cx="122" cy="204" rx="88" ry="6" fill="#05202B" opacity="0.35"/><ellipse cx="340" cy="204" rx="88" ry="6" fill="#05202B" opacity="0.35"/><rect x="6" y="142" width="448" height="18" rx="2" fill="#182228"/><rect x="6" y="139" width="448" height="4.5" fill="#7D969E"/><rect x="6" y="143.5" width="448" height="2" fill="#475D66"/><line x1="8" y1="141.2" x2="452" y2="141.2" stroke="#D5EAE6" stroke-width="1.4" stroke-dasharray="8 8" class="belt-dashes"/><g clip-path="url(#srDash_clip)"><g class="bottles-track"><use href="#srDash_bottle" x="6" y="106"/><use href="#srDash_bottle" x="34" y="106"/><use href="#srDash_bottle" x="62" y="106"/><use href="#srDash_bottle" x="90" y="106"/><use href="#srDash_bottle" x="118" y="106"/><use href="#srDash_bottle" x="146" y="106"/><use href="#srDash_bottle" x="174" y="106"/><use href="#srDash_bottle" x="202" y="106"/><use href="#srDash_bottle" x="230" y="106"/><use href="#srDash_bottle" x="258" y="106"/><use href="#srDash_bottle" x="286" y="106"/><use href="#srDash_bottle" x="314" y="106"/><use href="#srDash_bottle" x="342" y="106"/><use href="#srDash_bottle" x="370" y="106"/><use href="#srDash_bottle" x="398" y="106"/><use href="#srDash_bottle" x="426" y="106"/><use href="#srDash_bottle" x="454" y="106"/><use href="#srDash_bottle" x="482" y="106"/></g><rect x="6" y="134" width="448" height="2.2" fill="#E6F4F1" opacity="0.65"/><rect x="6" y="128" width="448" height="1.2" fill="#B5D4D0" opacity="0.5"/></g><g transform="translate(36,0)"><rect x="14" y="182" width="144" height="5" rx="1" fill="#1C2327"/><rect x="16" y="187" width="4" height="14" fill="#2A3439"/><rect x="11" y="200" width="14" height="3" rx="1.5" fill="#141A1D"/><rect x="150" y="187" width="4" height="14" fill="#2A3439"/><rect x="145" y="200" width="14" height="3" rx="1.5" fill="#141A1D"/><rect x="28" y="187" width="3" height="8" fill="#1F282C"/><rect x="24" y="194" width="11" height="2.5" rx="1" fill="#141A1D"/><rect x="139" y="187" width="3" height="8" fill="#1F282C"/><rect x="135" y="194" width="11" height="2.5" rx="1" fill="#141A1D"/><rect x="20" y="21" width="4" height="7" fill="#263238"/><rect x="18" y="7" width="8" height="4.5" rx="1" fill="#D93025"/><rect x="18" y="11.5" width="8" height="4.5" fill="#F9AB00"/><rect x="18" y="16" width="8" height="5" rx="1" fill="#18C964" class="tower-green"/><rect x="6" y="28" width="158" height="34" rx="2" fill="url(#srDash_cabTop)" stroke="#C98400" stroke-width="0.8"/><g transform="translate(15,34)"><rect x="5" y="5" width="12" height="12" rx="1.5" fill="#FFF8E1" stroke="#182228" stroke-width="1.2"/><text x="11" y="12.5" text-anchor="middle" font-size="6.2" font-weight="900" fill="#182228" font-family="Arial,sans-serif">AI</text><text x="11" y="16" text-anchor="middle" font-size="3.1" font-weight="700" fill="#182228" font-family="Arial,sans-serif">inside</text><path d="M8 2V5 M14 2V5 M8 17V20 M14 17V20 M2 8H5 M2 14H5 M17 8H20 M17 14H20" stroke="#182228" stroke-width="1" stroke-linecap="round"/></g><rect x="6" y="64" width="158" height="119" rx="2" fill="url(#srDash_cabYellow)" stroke="#C98400" stroke-width="0.8"/><line x1="83" y1="64" x2="83" y2="183" stroke="#A66D00" stroke-width="1.2"/><g transform="translate(32,152) rotate(-90)"><text x="0" y="0" font-size="22" font-weight="900" fill="#FFFFFF" stroke="#1C252C" stroke-width="0.9" font-family="Segoe UI,Arial,sans-serif" letter-spacing="0.5">mcal 4</text></g><circle cx="25" cy="166" r="6" fill="#3B82F6"/><path d="M25 162V170 M21.5 164L28.5 168 M28.5 164L21.5 168" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round"/><rect x="70" y="124" width="9" height="11" rx="1.2" fill="#1E252B"/><rect x="72" y="126" width="5" height="7" rx="0.8" fill="#37434D"/><g transform="translate(115,69)"><circle cx="4" cy="4" r="3" fill="#FFFFFF" opacity="0.95"/><text x="10" y="6.8" font-size="9.5" font-weight="800" fill="#FFFFFF" font-family="Segoe UI,Arial,sans-serif">tiama</text></g><rect x="92" y="80" width="64" height="58" rx="3" fill="#171E24" stroke="#2D3842" stroke-width="1"/><rect x="95" y="85" width="58" height="29" rx="1.2" fill="#F4F7F9"/><rect x="96.5" y="87" width="24" height="25" fill="#E3ECEF"/><line x1="99" y1="91" x2="117" y2="91" stroke="#90A4AE" stroke-width="1.3"/><line x1="99" y1="95" x2="114" y2="95" stroke="#B0BEC5" stroke-width="1.1"/><line x1="99" y1="99" x2="116" y2="99" stroke="#B0BEC5" stroke-width="1.1"/><line x1="99" y1="103" x2="112" y2="103" stroke="#B0BEC5" stroke-width="1.1"/><path d="M135 90 H138 V94.5 C138 96 140 97.5 140 100 V111 H133 V100 C133 97.5 135 96 135 94.5 Z" fill="#455A64"/><line x1="126" y1="101" x2="147" y2="101" stroke="#10B981" stroke-width="1.2" class="scan-beam"/><circle cx="124" cy="122" r="4.2" fill="#FACC15"/><circle cx="124" cy="122" r="2.8" fill="#DC2626"/><circle cx="106" cy="122" r="1.8" fill="#38BDF8"/><circle cx="113" cy="122" r="1.8" fill="#22C55E"/><circle cx="135" cy="122" r="1.8" fill="#F97316"/><circle cx="142" cy="122" r="1.8" fill="#94A3B8"/><rect x="108" y="131" width="32" height="4" rx="1" fill="#334155"/><rect x="86" y="124" width="4" height="11" rx="1" fill="#1E252B"/><rect x="158" y="124" width="4" height="11" rx="1" fill="#1E252B"/></g><g transform="translate(254,0)"><rect x="14" y="182" width="144" height="5" rx="1" fill="#1C2327"/><rect x="16" y="187" width="4" height="14" fill="#2A3439"/><rect x="11" y="200" width="14" height="3" rx="1.5" fill="#141A1D"/><rect x="150" y="187" width="4" height="14" fill="#2A3439"/><rect x="145" y="200" width="14" height="3" rx="1.5" fill="#141A1D"/><rect x="28" y="187" width="3" height="8" fill="#1F282C"/><rect x="24" y="194" width="11" height="2.5" rx="1" fill="#141A1D"/><rect x="139" y="187" width="3" height="8" fill="#1F282C"/><rect x="135" y="194" width="11" height="2.5" rx="1" fill="#141A1D"/><rect x="20" y="21" width="4" height="7" fill="#263238"/><rect x="18" y="7" width="8" height="4.5" rx="1" fill="#D93025"/><rect x="18" y="11.5" width="8" height="4.5" fill="#F9AB00"/><rect x="18" y="16" width="8" height="5" rx="1" fill="#18C964" class="tower-green"/><rect x="6" y="28" width="158" height="34" rx="2" fill="url(#srDash_cabTop)" stroke="#C98400" stroke-width="0.8"/><g transform="translate(15,34)"><rect x="5" y="5" width="12" height="12" rx="1.5" fill="#FFF8E1" stroke="#182228" stroke-width="1.2"/><text x="11" y="12.5" text-anchor="middle" font-size="6.2" font-weight="900" fill="#182228" font-family="Arial,sans-serif">AI</text><text x="11" y="16" text-anchor="middle" font-size="3.1" font-weight="700" fill="#182228" font-family="Arial,sans-serif">inside</text><path d="M8 2V5 M14 2V5 M8 17V20 M14 17V20 M2 8H5 M2 14H5 M17 8H20 M17 14H20" stroke="#182228" stroke-width="1" stroke-linecap="round"/></g><rect x="6" y="64" width="158" height="119" rx="2" fill="url(#srDash_cabYellow)" stroke="#C98400" stroke-width="0.8"/><line x1="83" y1="64" x2="83" y2="183" stroke="#A66D00" stroke-width="1.2"/><g transform="translate(32,154) rotate(-90)"><text x="0" y="0" font-size="22" font-weight="900" fill="#FFFFFF" stroke="#1C252C" stroke-width="0.9" font-family="Segoe UI,Arial,sans-serif" letter-spacing="0.5">multi 4</text></g><circle cx="25" cy="166" r="6" fill="#3B82F6"/><path d="M25 162V170 M21.5 164L28.5 168 M28.5 164L21.5 168" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round"/><rect x="70" y="124" width="9" height="11" rx="1.2" fill="#1E252B"/><rect x="72" y="126" width="5" height="7" rx="0.8" fill="#37434D"/><g transform="translate(115,69)"><circle cx="4" cy="4" r="3" fill="#FFFFFF" opacity="0.95"/><text x="10" y="6.8" font-size="9.5" font-weight="800" fill="#FFFFFF" font-family="Segoe UI,Arial,sans-serif">tiama</text></g><rect x="92" y="80" width="64" height="58" rx="3" fill="#171E24" stroke="#2D3842" stroke-width="1"/><rect x="95" y="85" width="58" height="29" rx="1.2" fill="#F4F7F9"/><rect x="96.5" y="87" width="18" height="25" fill="#E3ECEF"/><line x1="98.5" y1="91" x2="112" y2="91" stroke="#90A4AE" stroke-width="1.3"/><line x1="98.5" y1="95" x2="110" y2="95" stroke="#B0BEC5" stroke-width="1.1"/><line x1="98.5" y1="99" x2="111" y2="99" stroke="#B0BEC5" stroke-width="1.1"/><rect x="118" y="87" width="26" height="25" rx="1" fill="#111827"/><circle cx="131" cy="99.5" r="7.5" stroke="#E2E8F0" stroke-width="1.2" fill="none"/><circle cx="131" cy="99.5" r="4.2" stroke="#10B981" stroke-width="1.3" fill="none" class="scan-beam-delay"/><circle cx="124" cy="122" r="4.2" fill="#FACC15"/><circle cx="124" cy="122" r="2.8" fill="#DC2626"/><circle cx="104" cy="122" r="1.8" fill="#3B82F6"/><circle cx="110" cy="122" r="1.8" fill="#22C55E"/><circle cx="116" cy="122" r="1.8" fill="#EF4444"/><circle cx="134" cy="122" r="1.8" fill="#F97316"/><circle cx="141" cy="122" r="1.8" fill="#E2E8F0"/><rect x="108" y="131" width="32" height="4" rx="1" fill="#334155"/><rect x="86" y="124" width="4" height="11" rx="1" fill="#1E252B"/><rect x="158" y="124" width="4" height="11" rx="1" fill="#1E252B"/></g><g opacity="0.72"><path d="M238 168 H214 M218 164.5 L213 168 L218 171.5" stroke="#8CF2C9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+        <section class="hero" id="srHeroSection" style="--hero-speed:3.6s;">
+          <div class="hero-copy">
+            <div class="hero-tag">GLASS PRODUCTION · FOOD SAFETY</div>
+            <h2>Ringkasan Success Rate</h2>
+            <p>Bandingkan tingkat keberhasilan inspeksi harian pada setiap line dan pantau perubahan performanya.</p>
+            <div class="hero-controls-row">
+              <div class="hero-pill-bar" role="group" aria-label="Pilih warna botol">
+                <span class="hero-pill-label">BOTOL</span>
+                <button type="button" class="hero-bottle-btn" data-sr-bottle="green" onclick="setSrHeroBottle('green')"><i class="hero-bottle-dot dot-green"></i><span>Green</span></button>
+                <button type="button" class="hero-bottle-btn active" data-sr-bottle="amber" onclick="setSrHeroBottle('amber')"><i class="hero-bottle-dot dot-amber"></i><span>Amber</span></button>
+                <button type="button" class="hero-bottle-btn" data-sr-bottle="flint" onclick="setSrHeroBottle('flint')"><i class="hero-bottle-dot dot-flint"></i><span>Flint</span></button>
+              </div>
+              <label class="hero-speed-pill" title="Atur kecepatan putaran animasi (1.5s - 7.0s)">
+                <span class="hero-pill-label" style="margin-right:0;">SPEED</span>
+                <input type="range" class="hero-speed-slider" id="srHeroSpeedInput" min="1.5" max="7.0" step="0.1" value="3.6" oninput="setSrHeroSpeed(this.value)">
+                <span class="hero-speed-val" id="srHeroSpeedVal">3.6s</span>
+              </label>
+            </div>
+          </div>
+          <svg class="hero-bottles" viewBox="0 0 480 225" fill="none" role="img" aria-label="Animasi Mesin FP PT KCI dengan banyak lampu sensor merah dan putaran servo per station">
+            <defs>
+              <radialGradient id="srFp_redMainGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ff1a1a" stop-opacity="0.92"/>
+                <stop offset="40%" stop-color="#ef4444" stop-opacity="0.60"/>
+                <stop offset="75%" stop-color="#dc2626" stop-opacity="0.22"/>
+                <stop offset="100%" stop-color="#7f1d1d" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="srFp_whiteHotRed" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                <stop offset="30%" stop-color="#ffe4e6" stop-opacity="0.95"/>
+                <stop offset="65%" stop-color="#ff1e1e" stop-opacity="0.78"/>
+                <stop offset="100%" stop-color="#dc2626" stop-opacity="0"/>
+              </radialGradient>
+              <linearGradient id="srFp_stainlessGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#e2e8f0"/>
+                <stop offset="22%" stop-color="#ffffff"/>
+                <stop offset="55%" stop-color="#94a3b8"/>
+                <stop offset="100%" stop-color="#475569"/>
+              </linearGradient>
+              <linearGradient id="srFp_tanBoxGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#e7d393"/>
+                <stop offset="30%" stop-color="#d6be76"/>
+                <stop offset="100%" stop-color="#9c823e"/>
+              </linearGradient>
+              <linearGradient id="srFp_drumGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#1e242d"/>
+                <stop offset="35%" stop-color="#525d6d"/>
+                <stop offset="65%" stop-color="#3a4350"/>
+                <stop offset="100%" stop-color="#171b22"/>
+              </linearGradient>
+              <linearGradient id="srFp_legChrome" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#64748b"/>
+                <stop offset="45%" stop-color="#f8fafc"/>
+                <stop offset="75%" stop-color="#ef4444"/>
+                <stop offset="100%" stop-color="#334155"/>
+              </linearGradient>
+              <linearGradient id="srFp_bottleGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" id="srFp_bCol1" stop-color="#451a03"/>
+                <stop offset="40%" id="srFp_bCol2" stop-color="#d97706"/>
+                <stop offset="75%" id="srFp_bCol3" stop-color="#78350f"/>
+                <stop offset="100%" id="srFp_bCol4" stop-color="#270e02"/>
+              </linearGradient>
+              <clipPath id="srFp_rightInfeedClip"><rect x="276" y="42" width="196" height="52"/></clipPath>
+              <clipPath id="srFp_leftOutfeedClip"><rect x="6" y="42" width="174" height="52"/></clipPath>
+            </defs>
+            <ellipse cx="240" cy="216" rx="228" ry="6" fill="#03121a" opacity="0.55"/>
+            <line x1="345" y1="98" x2="345" y2="155" stroke="#64748b" stroke-width="3"/>
+            <line x1="425" y1="98" x2="425" y2="155" stroke="#64748b" stroke-width="3"/>
+            <g clip-path="url(#srFp_rightInfeedClip)">
+              <g class="infeed-bottles">
+                <g transform="translate(270,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(288,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(306,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(324,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(342,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(360,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(378,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(396,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(414,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(432,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(450,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(468,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+              </g>
+            </g>
+            <rect x="292" y="83" width="182" height="14" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1"/>
+            <rect x="292" y="86" width="182" height="7" fill="#0d9488"/>
+            <line x1="292" y1="76" x2="474" y2="76" stroke="#94a3b8" stroke-width="1.8"/>
+            <rect x="326" y="74" width="4" height="14" rx="1" fill="#f8fafc" stroke="#475569" stroke-width="0.6"/>
+            <rect x="364" y="74" width="4" height="14" rx="1" fill="#f8fafc" stroke="#475569" stroke-width="0.6"/>
+            <rect x="402" y="74" width="4" height="14" rx="1" fill="#f8fafc" stroke="#475569" stroke-width="0.6"/>
+            <rect x="444" y="84" width="28" height="24" rx="3" fill="#f1f5f9" stroke="#64748b" stroke-width="1.2"/>
+            <circle cx="453" cy="96" r="5" fill="#1e293b" stroke="#94a3b8" stroke-width="1"/>
+            <circle cx="465" cy="100" r="3.5" fill="#1e293b"/>
+            <g clip-path="url(#srFp_leftOutfeedClip)">
+              <g class="infeed-bottles">
+                <g transform="translate(8,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(26,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(44,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(62,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(80,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(98,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(116,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(134,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(152,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+                <g transform="translate(170,0)"><path d="M4 58 H7.5 V65 L10 70 V86 H1.5 V70 L4 65 Z" fill="url(#srFp_bottleGrad)" stroke="#fde68a" stroke-width="0.5"/><rect x="3.8" y="56.5" width="4" height="1.8" rx="0.6" fill="#fef08a"/></g>
+              </g>
+            </g>
+            <rect x="6" y="83" width="156" height="14" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1"/>
+            <rect x="6" y="86" width="156" height="7" fill="#0d9488"/>
+            <line x1="6" y1="76" x2="162" y2="76" stroke="#94a3b8" stroke-width="1.8"/>
+            <path d="M10 46 H92 L86 57 H6 Z" fill="#eab308" stroke="#a16207" stroke-width="1.2"/>
+            <line x1="22" y1="57" x2="22" y2="84" stroke="#eab308" stroke-width="3"/>
+            <line x1="76" y1="57" x2="76" y2="84" stroke="#eab308" stroke-width="3"/>
+            <g>
+              <path d="M14 115 V80 H78 V115" stroke="#64748b" stroke-width="2.2" fill="none"/>
+              <path d="M12 115 L82 115 L88 212 L8 212 Z" fill="#334155" fill-opacity="0.55" stroke="#64748b" stroke-width="1.5"/>
+              <rect x="14" y="114" width="68" height="8" rx="1" fill="#94a3b8" stroke="#334155" stroke-width="1"/>
+              <rect x="11" y="146" width="72" height="8" rx="1" fill="#94a3b8" stroke="#334155" stroke-width="1"/>
+              <rect x="8" y="178" width="76" height="8" rx="1" fill="#94a3b8" stroke="#334155" stroke-width="1"/>
+            </g>
+            <rect x="140" y="24" width="170" height="114" rx="6" fill="#11161d" stroke="#334155" stroke-width="1.5"/>
+            <rect x="172" y="4" width="44" height="22" rx="2" fill="#e2e8f0" stroke="#475569" stroke-width="1.2"/>
+            <circle cx="182" cy="15" r="2" fill="#dc2626"/>
+            <circle cx="192" cy="15" r="2" fill="#1e293b"/>
+            <rect x="218" y="6" width="22" height="20" rx="2" fill="#1e293b" stroke="#94a3b8" stroke-width="1"/>
+            <circle cx="229" cy="16" r="6" fill="#334155" stroke="#cbd5e1" stroke-width="0.8"/>
+            <rect x="242" y="4" width="46" height="22" rx="2" fill="#e2e8f0" stroke="#475569" stroke-width="1.2"/>
+            <rect x="250" y="10" width="14" height="8" fill="#1e293b"/>
+            <circle cx="275" cy="15" r="2.2" fill="#dc2626"/>
+            <rect x="166" y="42" width="5" height="90" fill="#94a3b8" stroke="#334155" stroke-width="0.8"/>
+            <rect x="292" y="42" width="5" height="90" fill="#94a3b8" stroke="#334155" stroke-width="0.8"/>
+            <rect x="227" y="58" width="10" height="62" fill="#334155" stroke="#64748b" stroke-width="0.8"/>
+            <ellipse cx="232" cy="72" rx="41" ry="8" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 3" fill="none" opacity="0.6"/>
+            <ellipse cx="232" cy="108" rx="41" ry="9" fill="#1e293b" fill-opacity="0.55" stroke="#64748b" stroke-width="1.4"/>
+            <ellipse class="fp-core-aura" cx="232" cy="88" rx="70" ry="44" fill="url(#srFp_redMainGlow)"/>
+            <circle class="red-s1" cx="238" cy="84" r="30" fill="url(#srFp_whiteHotRed)"/>
+            <rect x="180" y="34" width="22" height="16" rx="2" fill="#fb923c" opacity="0.85"/>
+            <rect x="183" y="36.5" width="16" height="11" rx="1" fill="#fef08a"/>
+            <g class="fp-station fp-st-1">
+              <rect x="230.2" y="56" width="3.6" height="17" fill="url(#srFp_legChrome)"/>
+              <rect x="228.5" y="70" width="7" height="4" rx="1" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+              <ellipse cx="232" cy="91" rx="7" ry="2.4" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+              <path d="M230.2 74 H233.8 V81 L236.5 86 V105 H227.5 V86 L230.2 81 Z" fill="url(#srFp_bottleGrad)" stroke="#fecaca" stroke-width="1"/>
+              <rect x="230" y="72.5" width="4" height="1.8" rx="0.5" fill="#fef08a"/>
+              <ellipse cx="232" cy="105.5" rx="6" ry="2" fill="#475569" stroke="#fca5a5" stroke-width="0.7"/>
+            </g>
+            <g class="fp-station fp-st-2">
+              <rect x="230.2" y="56" width="3.6" height="17" fill="url(#srFp_legChrome)"/>
+              <rect x="228.5" y="70" width="7" height="4" rx="1" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+              <ellipse cx="232" cy="91" rx="7" ry="2.4" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+              <path d="M230.2 74 H233.8 V81 L236.5 86 V105 H227.5 V86 L230.2 81 Z" fill="url(#srFp_bottleGrad)" stroke="#fecaca" stroke-width="1"/>
+              <rect x="230" y="72.5" width="4" height="1.8" rx="0.5" fill="#fef08a"/>
+              <ellipse cx="232" cy="105.5" rx="6" ry="2" fill="#475569" stroke="#fca5a5" stroke-width="0.7"/>
+            </g>
+            <g class="fp-station fp-st-3">
+              <rect x="230.2" y="56" width="3.6" height="17" fill="url(#srFp_legChrome)"/>
+              <rect x="228.5" y="70" width="7" height="4" rx="1" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+              <ellipse cx="232" cy="91" rx="7" ry="2.4" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+              <path d="M230.2 74 H233.8 V81 L236.5 86 V105 H227.5 V86 L230.2 81 Z" fill="url(#srFp_bottleGrad)" stroke="#fecaca" stroke-width="1"/>
+              <rect x="230" y="72.5" width="4" height="1.8" rx="0.5" fill="#fef08a"/>
+              <ellipse cx="232" cy="105.5" rx="6" ry="2" fill="#475569" stroke="#fca5a5" stroke-width="0.7"/>
+            </g>
+            <g class="fp-station fp-st-4">
+              <rect x="230.2" y="56" width="3.6" height="17" fill="url(#srFp_legChrome)"/>
+              <rect x="228.5" y="70" width="7" height="4" rx="1" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+              <ellipse cx="232" cy="91" rx="7" ry="2.4" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+              <path d="M230.2 74 H233.8 V81 L236.5 86 V105 H227.5 V86 L230.2 81 Z" fill="url(#srFp_bottleGrad)" stroke="#fecaca" stroke-width="1"/>
+              <rect x="230" y="72.5" width="4" height="1.8" rx="0.5" fill="#fef08a"/>
+              <ellipse cx="232" cy="105.5" rx="6" ry="2" fill="#475569" stroke="#fca5a5" stroke-width="0.7"/>
+            </g>
+            <g class="fp-station fp-st-5">
+              <rect x="230.2" y="56" width="3.6" height="17" fill="url(#srFp_legChrome)"/>
+              <rect x="228.5" y="70" width="7" height="4" rx="1" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+              <ellipse cx="232" cy="91" rx="7" ry="2.4" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+              <path d="M230.2 74 H233.8 V81 L236.5 86 V105 H227.5 V86 L230.2 81 Z" fill="url(#srFp_bottleGrad)" stroke="#fecaca" stroke-width="1"/>
+              <rect x="230" y="72.5" width="4" height="1.8" rx="0.5" fill="#fef08a"/>
+              <ellipse cx="232" cy="105.5" rx="6" ry="2" fill="#475569" stroke="#fca5a5" stroke-width="0.7"/>
+            </g>
+            <g class="fp-station fp-st-6">
+              <rect x="230.2" y="56" width="3.6" height="17" fill="url(#srFp_legChrome)"/>
+              <rect x="228.5" y="70" width="7" height="4" rx="1" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+              <ellipse cx="232" cy="91" rx="7" ry="2.4" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+              <path d="M230.2 74 H233.8 V81 L236.5 86 V105 H227.5 V86 L230.2 81 Z" fill="url(#srFp_bottleGrad)" stroke="#fecaca" stroke-width="1"/>
+              <rect x="230" y="72.5" width="4" height="1.8" rx="0.5" fill="#fef08a"/>
+              <ellipse cx="232" cy="105.5" rx="6" ry="2" fill="#475569" stroke="#fca5a5" stroke-width="0.7"/>
+            </g>
+            <path d="M190 91 C190 97, 274 97, 274 91" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4" fill="none" opacity="0.85"/>
+            <path class="turret-drum-ticks" d="M191 110 C191 117, 273 117, 273 110" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="7 7" fill="none"/>
+            <ellipse cx="232" cy="48" rx="42" ry="7.5" fill="#475569" stroke="#94a3b8" stroke-width="1"/>
+            <path d="M190 48 V61 C190 67, 274 67, 274 61 V48 Z" fill="url(#srFp_drumGrad)" stroke="#64748b" stroke-width="1"/>
+            <ellipse cx="232" cy="48" rx="32" ry="4.5" fill="#1e293b"/>
+            <path class="turret-drum-ticks" d="M193 56 C193 62, 271 62, 271 56" stroke="#cbd5e1" stroke-width="2.2" stroke-dasharray="6 8" fill="none"/>
+            <path d="M162 96 H146 C138 96, 136 88, 136 78 V42 C136 28, 146 22, 162 22 H222 V32 H164 C154 32, 150 36, 150 45 V76 C150 83, 154 86, 162 86 Z" fill="#64748b" stroke="#334155" stroke-width="1.5"/>
+            <circle cx="145" cy="78" r="5" fill="#475569" stroke="#cbd5e1" stroke-width="1"/>
+            <rect class="red-s1" x="234" y="68" width="14" height="16" rx="2" fill="#ff1a1a" stroke="#fecaca" stroke-width="1.1"/>
+            <rect class="red-s2" x="236.5" y="70.5" width="9" height="11" rx="1" fill="#ffffff"/>
+            <rect class="red-s2" x="168" y="83" width="22" height="5.5" rx="2" fill="#ff1e1e" stroke="#fecaca" stroke-width="0.8"/>
+            <line x1="171" y1="85.8" x2="187" y2="85.8" stroke="#ffffff" stroke-width="1.6"/>
+            <g transform="rotate(-18 184 73)">
+              <rect x="168" y="69.5" width="20" height="6.5" rx="2" fill="#cbd5e1" stroke="#334155" stroke-width="0.9"/>
+              <circle cx="172" cy="72.8" r="3.8" fill="#e2e8f0" stroke="#475569" stroke-width="1"/>
+              <circle class="red-s1" cx="188" cy="72.8" r="4.2" fill="#ff1a1a"/>
+              <circle cx="188" cy="72.8" r="1.8" fill="#ffffff"/>
+            </g>
+            <g transform="rotate(12 212 75)">
+              <rect x="202" y="71.5" width="19" height="6.5" rx="2" fill="#cbd5e1" stroke="#334155" stroke-width="0.9"/>
+              <circle cx="208" cy="74.8" r="4.5" fill="#f1f5f9" stroke="#475569" stroke-width="1"/>
+              <circle cx="208" cy="74.8" r="1.8" fill="#1e293b"/>
+              <circle class="red-s3" cx="221" cy="74.8" r="4.5" fill="#ff1e1e"/>
+              <circle cx="221" cy="74.8" r="2" fill="#ffffff"/>
+            </g>
+            <g transform="rotate(-14 262 75)">
+              <rect x="250" y="71.5" width="20" height="6.5" rx="2" fill="#cbd5e1" stroke="#334155" stroke-width="0.9"/>
+              <circle cx="265" cy="74.8" r="4.5" fill="#f1f5f9" stroke="#475569" stroke-width="1"/>
+              <circle cx="265" cy="74.8" r="1.8" fill="#1e293b"/>
+              <circle class="red-s1" cx="250" cy="74.8" r="4.5" fill="#ff1e1e"/>
+              <circle cx="250" cy="74.8" r="2" fill="#ffffff"/>
+            </g>
+            <g transform="rotate(20 284 74)">
+              <rect x="272" y="70.5" width="20" height="6.5" rx="2" fill="#cbd5e1" stroke="#334155" stroke-width="0.9"/>
+              <circle class="red-s2" cx="272" cy="73.8" r="4.2" fill="#ff1a1a"/>
+              <circle cx="272" cy="73.8" r="1.8" fill="#ffffff"/>
+            </g>
+            <g class="red-s1"><circle cx="164" cy="95" r="6.5" fill="#ef4444" opacity="0.5"/><circle cx="164" cy="95" r="3.4" fill="#ff2a2a"/><circle cx="164" cy="95" r="1.5" fill="#ffffff"/></g>
+            <g class="red-s3"><circle cx="196" cy="93" r="7.5" fill="#ff1a1a" opacity="0.6"/><circle cx="196" cy="93" r="3.8" fill="#ff2a2a"/><circle cx="196" cy="93" r="1.6" fill="#ffffff"/></g>
+            <g class="red-s2"><circle cx="215" cy="93" r="8.5" fill="#ff1a1a" opacity="0.72"/><circle cx="215" cy="93" r="4.2" fill="#ff2a2a"/><circle cx="215" cy="93" r="2" fill="#ffffff"/></g>
+            <g class="red-s1"><circle cx="250" cy="93" r="9" fill="#ff1a1a" opacity="0.75"/><circle cx="250" cy="93" r="4.6" fill="#ff2a2a"/><circle cx="250" cy="93" r="2.2" fill="#ffffff"/></g>
+            <g class="red-s3"><circle cx="270" cy="93" r="7.5" fill="#ff1a1a" opacity="0.6"/><circle cx="270" cy="93" r="3.8" fill="#ff2a2a"/><circle cx="270" cy="93" r="1.6" fill="#ffffff"/></g>
+            <g class="red-s2"><circle cx="290" cy="90" r="6.5" fill="#ef4444" opacity="0.5"/><circle cx="290" cy="90" r="3.4" fill="#ff2a2a"/><circle cx="290" cy="90" r="1.5" fill="#ffffff"/></g>
+            <g class="red-s2"><circle cx="180" cy="108" r="7" fill="#ff1a1a" opacity="0.55"/><circle cx="180" cy="108" r="3.5" fill="#ff2a2a"/><circle cx="180" cy="108" r="1.5" fill="#ffffff"/></g>
+            <g class="red-s1"><circle cx="212" cy="112" r="8" fill="#ff1a1a" opacity="0.68"/><circle cx="212" cy="112" r="4" fill="#ff2a2a"/><circle cx="212" cy="112" r="1.7" fill="#ffffff"/></g>
+            <g class="red-s3"><circle cx="232" cy="114" r="8.5" fill="#ff1a1a" opacity="0.7"/><circle cx="232" cy="114" r="4.2" fill="#ff2a2a"/><circle cx="232" cy="114" r="2" fill="#ffffff"/></g>
+            <g class="red-s2"><circle cx="252" cy="112" r="8" fill="#ff1a1a" opacity="0.68"/><circle cx="252" cy="112" r="4" fill="#ff2a2a"/><circle cx="252" cy="112" r="1.7" fill="#ffffff"/></g>
+            <g class="red-s3"><circle cx="280" cy="107" r="7" fill="#ef4444" opacity="0.55"/><circle cx="280" cy="107" r="3.5" fill="#ff2a2a"/><circle cx="280" cy="107" r="1.5" fill="#ffffff"/></g>
+            <line class="red-beam" x1="176" y1="86" x2="250" y2="108" stroke="#fecaca" stroke-width="1.3" stroke-dasharray="4 3"/>
+            <line class="red-beam" x1="282" y1="84" x2="213" y2="108" stroke="#ff4d4d" stroke-width="1.3" stroke-dasharray="4 3"/>
+            <path d="M155 138 C158 122, 170 114, 178 106" stroke="#cbd5e1" stroke-width="1.3" fill="none"/>
+            <path d="M168 138 C174 120, 188 112, 198 96" stroke="#94a3b8" stroke-width="1.3" fill="none"/>
+            <path d="M205 138 C208 122, 216 114, 222 98" stroke="#cbd5e1" stroke-width="1.3" fill="none"/>
+            <path d="M222 138 C225 120, 232 112, 238 96" stroke="#64748b" stroke-width="1.4" fill="none"/>
+            <path d="M255 138 C258 122, 262 112, 260 98" stroke="#cbd5e1" stroke-width="1.3" fill="none"/>
+            <path d="M272 138 C280 122, 286 112, 280 96" stroke="#f97316" stroke-width="1.4" fill="none"/>
+            <g transform="rotate(-5 114 86)">
+              <rect x="98" y="68" width="32" height="36" rx="2" fill="#f1f5f9" stroke="#64748b" stroke-width="1"/>
+              <rect x="100" y="70" width="28" height="8" rx="1" fill="#facc15"/>
+              <text x="114" y="76" text-anchor="middle" fill="#0f172a" font-size="4.8" font-weight="900" font-family="Arial">CAUTION</text>
+              <line x1="103" y1="83" x2="125" y2="83" stroke="#ef4444" stroke-width="1.2"/>
+              <line x1="103" y1="88" x2="123" y2="88" stroke="#475569" stroke-width="1"/>
+              <line x1="103" y1="93" x2="125" y2="93" stroke="#475569" stroke-width="1"/>
+              <line x1="103" y1="98" x2="120" y2="98" stroke="#475569" stroke-width="1"/>
+            </g>
+            <rect x="96" y="114" width="24" height="46" rx="2" fill="#64748b" stroke="#1e293b" stroke-width="1.3"/>
+            <rect x="99" y="117" width="18" height="40" rx="1.5" fill="#94a3b8"/>
+            <circle cx="108" cy="124" r="4.2" fill="#dc2626" stroke="#fef2f2" stroke-width="0.9"/>
+            <circle cx="108" cy="136" r="4.2" fill="#16a34a" stroke="#f0fdf4" stroke-width="0.9"/>
+            <circle cx="108" cy="148" r="4.2" fill="#e2e8f0" stroke="#334155" stroke-width="0.9"/>
+            <rect x="102" y="168" width="32" height="46" rx="2" fill="#e2e8f0" stroke="#64748b" stroke-width="1.2"/>
+            <circle cx="112" cy="178" r="2" fill="#dc2626"/>
+            <circle cx="122" cy="178" r="2" fill="#1e293b"/>
+            <circle cx="112" cy="188" r="1.8" fill="#1e293b"/>
+            <circle cx="122" cy="188" r="1.8" fill="#dc2626"/>
+            <circle cx="112" cy="198" r="1.8" fill="#1e293b"/>
+            <circle cx="122" cy="198" r="2.2" fill="#dc2626"/>
+            <g transform="translate(132, 138)">
+              <rect x="10" y="-5" width="4" height="5" fill="#cbd5e1" stroke="#334155" stroke-width="0.7"/>
+              <rect x="34" y="-6" width="4" height="6" fill="#cbd5e1" stroke="#334155" stroke-width="0.7"/>
+              <rect x="0" y="0" width="50" height="42" rx="2.5" fill="url(#srFp_stainlessGrad)" stroke="#334155" stroke-width="1.3"/>
+              <ellipse cx="25" cy="13" rx="11" ry="3.8" fill="#334155" stroke="#f8fafc" stroke-width="1"/>
+              <rect x="14" y="23" width="22" height="11" rx="1.5" fill="#0284c7" stroke="#bae6fd" stroke-width="0.7"/>
+              <text x="25" y="28" text-anchor="middle" fill="#ffffff" font-size="3.4" font-weight="900" font-family="Arial">TRIPLE CHECK</text>
+              <text x="25" y="32.2" text-anchor="middle" fill="#e0f2fe" font-size="3.2" font-weight="800" font-family="Arial">DETECTOR</text>
+            </g>
+            <g transform="translate(185, 138)">
+              <rect x="12" y="-5" width="4" height="5" fill="#cbd5e1" stroke="#334155" stroke-width="0.7"/>
+              <rect x="32" y="-6" width="4" height="6" fill="#cbd5e1" stroke="#334155" stroke-width="0.7"/>
+              <rect x="0" y="0" width="50" height="42" rx="2.5" fill="url(#srFp_stainlessGrad)" stroke="#334155" stroke-width="1.3"/>
+              <ellipse cx="25" cy="13" rx="11" ry="3.8" fill="#334155" stroke="#f8fafc" stroke-width="1"/>
+              <rect x="14" y="23" width="22" height="11" rx="1.5" fill="#e11d48" stroke="#fecdd3" stroke-width="0.7"/>
+              <text x="25" y="28" text-anchor="middle" fill="#ffffff" font-size="3.4" font-weight="900" font-family="Arial">TRIPLE CHECK</text>
+              <text x="25" y="32.2" text-anchor="middle" fill="#ffe4e6" font-size="3.2" font-weight="800" font-family="Arial">DETECTOR</text>
+            </g>
+            <g transform="translate(238, 138)">
+              <rect x="14" y="-5" width="4" height="5" fill="#cbd5e1" stroke="#334155" stroke-width="0.7"/>
+              <rect x="28" y="-6" width="4" height="6" fill="#cbd5e1" stroke="#334155" stroke-width="0.7"/>
+              <rect x="0" y="0" width="50" height="42" rx="2.5" fill="url(#srFp_stainlessGrad)" stroke="#334155" stroke-width="1.3"/>
+              <ellipse cx="25" cy="13" rx="11" ry="3.8" fill="#334155" stroke="#f8fafc" stroke-width="1"/>
+              <rect x="14" y="23" width="22" height="11" rx="1.5" fill="#0284c7" stroke="#bae6fd" stroke-width="0.7"/>
+              <text x="25" y="28" text-anchor="middle" fill="#ffffff" font-size="3.4" font-weight="900" font-family="Arial">TRIPLE CHECK</text>
+              <text x="25" y="32.2" text-anchor="middle" fill="#e0f2fe" font-size="3.2" font-weight="800" font-family="Arial">DETECTOR</text>
+            </g>
+            <g transform="translate(291, 133)">
+              <rect x="0" y="0" width="52" height="50" rx="2.5" fill="url(#srFp_tanBoxGrad)" stroke="#715b24" stroke-width="1.4"/>
+              <line x1="2" y1="12" x2="50" y2="12" stroke="#856b2a" stroke-width="1"/>
+            </g>
+            <rect x="136" y="182" width="198" height="34" fill="#18202c" stroke="#475569" stroke-width="1.5"/>
+            <line x1="176" y1="182" x2="176" y2="216" stroke="#64748b" stroke-width="2.5"/>
+            <line x1="290" y1="182" x2="290" y2="216" stroke="#64748b" stroke-width="2.5"/>
+            <rect x="224" y="185" width="38" height="29" rx="2" fill="#263140" stroke="#64748b" stroke-width="1"/>
+            <rect x="229" y="190" width="9" height="8" rx="1" fill="#f97316" stroke="#fed7aa" stroke-width="0.6"/>
+            <circle cx="249" cy="195" r="5" fill="#cbd5e1" stroke="#334155" stroke-width="0.8"/>
+            <path d="M315 183 C312 204, 338 214, 348 190 C355 170, 372 208, 382 185" stroke="#eab308" stroke-width="1.8" fill="none"/>
+            <path d="M326 183 C325 212, 355 216, 366 188" stroke="#f97316" stroke-width="1.4" fill="none"/>
+            <path d="M416 172 H452 L456 214 H412 Z" fill="#ca8a04" fill-opacity="0.35" stroke="#eab308" stroke-width="1.6"/>
+            <line x1="414" y1="186" x2="454" y2="186" stroke="#eab308" stroke-width="2"/>
+            <line x1="413" y1="200" x2="455" y2="200" stroke="#eab308" stroke-width="2"/>
+            <rect x="394" y="38" width="7" height="178" fill="#475569" stroke="#1e293b" stroke-width="1"/>
+            <rect x="372" y="34" width="46" height="6" rx="2" fill="#64748b" stroke="#334155" stroke-width="1"/>
+          </svg>
         </section>
         <section class="kpis" aria-label="Ringkasan bulan">
           <div class="kpi"><div class="kpi-label">Total Success Rate</div><div class="kpi-value" id="kpiRate">0%</div><div class="kpi-hint" id="kpiRateHint">Success Rate all machine</div></div>
@@ -667,7 +1013,31 @@
     const STATE = { page:'dashboard', inputUploads:{}, historyUploads:{}, uploadDate:null, manualMode:false, autoSamplingMode:false, toastTimer:null, dashboardData:null, dashboardComments:{daily:[],line:[]}, activeCommentDate:null, activeCommentChart:'daily', activeCommentLine:'', dashboardRequestId:0, calendarRequestId:{input:0,history:0}, downloadObjectUrl:null, analysisChartMode:'shift', activeProjectTab:'daily' };
     const $ = (id) => document.getElementById(id);
 
-    const DAILY_SRCDOC_B64 = ''; const PWA_DAILY_URL = '/daily-report.html?v=8';
+    const DAILY_SRCDOC_B64 = ''; const PWA_DAILY_URL = '/daily-report.html?v=9';
+
+    const SR_HERO_PALETTES = {
+      green: ['#15803d', '#4ade80', '#166534', '#052e16'],
+      amber: ['#451a03', '#d97706', '#78350f', '#270e02'],
+      flint: ['#64748b', '#f8fafc', '#94a3b8', '#334155']
+    };
+    function setSrHeroBottle(colorKey) {
+      const cols = SR_HERO_PALETTES[colorKey] || SR_HERO_PALETTES.amber;
+      if ($('srFp_bCol1')) $('srFp_bCol1').setAttribute('stop-color', cols[0]);
+      if ($('srFp_bCol2')) $('srFp_bCol2').setAttribute('stop-color', cols[1]);
+      if ($('srFp_bCol3')) $('srFp_bCol3').setAttribute('stop-color', cols[2]);
+      if ($('srFp_bCol4')) $('srFp_bCol4').setAttribute('stop-color', cols[3]);
+      document.querySelectorAll('[data-sr-bottle]').forEach((btn) => {
+        btn.classList.toggle('active', btn.getAttribute('data-sr-bottle') === colorKey);
+      });
+    }
+    function setSrHeroSpeed(val) {
+      const num = Math.max(1.5, Math.min(7.0, Number(val) || 3.6));
+      const str = num.toFixed(1) + 's';
+      if ($('srHeroSection')) $('srHeroSection').style.setProperty('--hero-speed', str);
+      if ($('srHeroSpeedVal')) $('srHeroSpeedVal').textContent = str;
+    }
+    window.setSrHeroBottle = setSrHeroBottle;
+    window.setSrHeroSpeed = setSrHeroSpeed;
     const DAILY_SRCDOC_HTML = (function(b64) {
       if (!b64) return '';
       try {
