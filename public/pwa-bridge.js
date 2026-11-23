@@ -49,6 +49,26 @@
                 if (!res.ok || !data || data.ok === false) {
                   throw new Error((data && data.error) || 'Gagal memanggil server (' + res.status + ')');
                 }
+                // Filter otomatis batang 'ICK' (tanpa angka) pada daftar mesin Line 14, 21, 24
+                try {
+                  const resObj = data.result;
+                  const cleanLinesMap = function (linesMap) {
+                    if (!linesMap || typeof linesMap !== 'object') return;
+                    Object.keys(linesMap).forEach(function (k) {
+                      if (Array.isArray(linesMap[k])) {
+                        linesMap[k] = linesMap[k].filter(function (m) {
+                          return String(m || '').toUpperCase().trim() !== 'ICK';
+                        });
+                      }
+                    });
+                  };
+                  if (resObj && typeof resObj === 'object') {
+                    cleanLinesMap(resObj.lines);
+                    if (resObj.initial) cleanLinesMap(resObj.initial.lines);
+                    if (resObj.inputOptions) cleanLinesMap(resObj.inputOptions.machines);
+                    if (resObj.initial && resObj.initial.inputOptions) cleanLinesMap(resObj.initial.inputOptions.machines);
+                  }
+                } catch (_e) {}
                 if (typeof current.onSuccess === 'function') {
                   current.onSuccess(data.result, current.userObject);
                 }
@@ -72,11 +92,37 @@
     window.google.script.run = createGasRunnerChain();
   }
 
-  // Registrasi Service Worker PWA
+  // Pembersihan Cache Lama (v1-v7) & Registrasi Service Worker PWA v8
+  const CURRENT_SW_CACHE = 'inspection-workspace-v8';
+  const PURGE_FLAG_KEY = 'pwa_cache_purged_v8';
   if ('serviceWorker' in navigator && window.top === window.self) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('/sw.js').catch(function () {});
-    });
+    (async function () {
+      try {
+        let hadOldCache = false;
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          for (let i = 0; i < keys.length; i++) {
+            if (keys[i] !== CURRENT_SW_CACHE) {
+              await caches.delete(keys[i]);
+              hadOldCache = true;
+            }
+          }
+        }
+        if (localStorage.getItem(PURGE_FLAG_KEY) !== '1') {
+          localStorage.setItem(PURGE_FLAG_KEY, '1');
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (let i = 0; i < regs.length; i++) {
+            await regs[i].unregister();
+          }
+          if (hadOldCache || regs.length > 0) {
+            window.location.reload();
+            return;
+          }
+        }
+        const reg = await navigator.serviceWorker.register('/sw.js?v=8');
+        if (reg && typeof reg.update === 'function') reg.update();
+      } catch (_err) {}
+    })();
   }
 
   // ===========================================================================

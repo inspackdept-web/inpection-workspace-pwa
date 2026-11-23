@@ -1,9 +1,8 @@
-const CACHE_NAME = 'inspection-workspace-v6';
+const CACHE_NAME = 'inspection-workspace-v8';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
   '/daily-report.html',
-  '/pwa-bridge.js?v=6',
   '/pwa-bridge.js',
   '/manifest.json',
   '/icon.svg'
@@ -15,7 +14,7 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME).then((cache) =>
       Promise.all(
         SHELL_ASSETS.map((url) =>
-          fetch(url, { cache: 'reload' })
+          fetch(url, { cache: 'no-cache', credentials: 'same-origin' })
             .then((res) => (res && res.ok ? cache.put(url, res) : null))
             .catch(() => {})
         )
@@ -40,9 +39,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first dengan cache: 'no-cache' agar update dari Vercel selalu langsung tampil di HP
+  // Gunakan req.url (string) untuk same-origin agar tidak terkena TypeError pada req.mode === 'navigate'
+  const fetchPromise = url.origin === self.location.origin
+    ? fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
+    : fetch(req);
+
   event.respondWith(
-    fetch(req, { cache: 'no-cache' })
+    fetchPromise
       .then((res) => {
         if (res && res.status === 200 && url.origin === self.location.origin) {
           const clone = res.clone();
