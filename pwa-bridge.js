@@ -49,6 +49,26 @@
                 if (!res.ok || !data || data.ok === false) {
                   throw new Error((data && data.error) || 'Gagal memanggil server (' + res.status + ')');
                 }
+                // Filter otomatis batang 'ICK' (tanpa angka) pada daftar mesin Line 14, 21, 24
+                try {
+                  const resObj = data.result;
+                  const cleanLinesMap = function (linesMap) {
+                    if (!linesMap || typeof linesMap !== 'object') return;
+                    Object.keys(linesMap).forEach(function (k) {
+                      if (Array.isArray(linesMap[k])) {
+                        linesMap[k] = linesMap[k].filter(function (m) {
+                          return String(m || '').toUpperCase().trim() !== 'ICK';
+                        });
+                      }
+                    });
+                  };
+                  if (resObj && typeof resObj === 'object') {
+                    cleanLinesMap(resObj.lines);
+                    if (resObj.initial) cleanLinesMap(resObj.initial.lines);
+                    if (resObj.inputOptions) cleanLinesMap(resObj.inputOptions.machines);
+                    if (resObj.initial && resObj.initial.inputOptions) cleanLinesMap(resObj.initial.inputOptions.machines);
+                  }
+                } catch (_e) {}
                 if (typeof current.onSuccess === 'function') {
                   current.onSuccess(data.result, current.userObject);
                 }
@@ -72,11 +92,37 @@
     window.google.script.run = createGasRunnerChain();
   }
 
-  // Registrasi Service Worker PWA
+  // Pembersihan Cache Lama (v1-v7) & Registrasi Service Worker PWA v8
+  const CURRENT_SW_CACHE = 'inspection-workspace-v8';
+  const PURGE_FLAG_KEY = 'pwa_cache_purged_v8';
   if ('serviceWorker' in navigator && window.top === window.self) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('/sw.js').catch(function () {});
-    });
+    (async function () {
+      try {
+        let hadOldCache = false;
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          for (let i = 0; i < keys.length; i++) {
+            if (keys[i] !== CURRENT_SW_CACHE) {
+              await caches.delete(keys[i]);
+              hadOldCache = true;
+            }
+          }
+        }
+        if (localStorage.getItem(PURGE_FLAG_KEY) !== '1') {
+          localStorage.setItem(PURGE_FLAG_KEY, '1');
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (let i = 0; i < regs.length; i++) {
+            await regs[i].unregister();
+          }
+          if (hadOldCache || regs.length > 0) {
+            window.location.reload();
+            return;
+          }
+        }
+        const reg = await navigator.serviceWorker.register('/sw.js?v=8');
+        if (reg && typeof reg.update === 'function') reg.update();
+      } catch (_err) {}
+    })();
   }
 
   // ===========================================================================
@@ -88,6 +134,125 @@
   //    - Tablet (Mode Landscape) & PC / Desktop
   // ===========================================================================
   const RESPONSIVE_CSS = `
+    /* -------- LEGEND KOMPLIT & 3 KARTU RINGKASAN KALENDER (SEMUA LAYAR) -------- */
+    .cal-legend-complete {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px 18px;
+      margin: 14px 0 12px;
+      padding: 4px 6px;
+      color: #607783;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .cal-leg-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .cal-leg-box {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border-radius: 4.5px;
+      flex: none;
+    }
+    .cal-leg-box.leg-green {
+      background: #e3f5eb;
+      border: 1.5px solid #80c7a5;
+    }
+    .cal-leg-box.leg-red {
+      background: #fde8e8;
+      border: 1.5px solid #e99b9b;
+    }
+    .cal-leg-box.leg-empty {
+      background: #f8fbfa;
+      border: 1.5px solid #dce7e5;
+    }
+    .cal-leg-box.leg-selected {
+      background: #eaf4f8;
+      border: 2px solid #137c9b;
+    }
+    .cal-leg-box.leg-today {
+      background: #ffffff;
+      border: 2px solid #239879;
+    }
+
+    /* Highlight Hari Ini & Dipilih pada Kalender */
+    .calendar-day.is-today,
+    .input-calendar-day.is-today {
+      box-shadow: inset 0 0 0 2px #239879 !important;
+    }
+    .calendar-day.is-selected,
+    .input-calendar-day.is-selected {
+      box-shadow: inset 0 0 0 2.2px #137c9b, 0 4px 12px rgba(19, 124, 155, 0.22) !important;
+      border-color: #137c9b !important;
+    }
+
+    /* 3 Kartu Ringkasan Kalender (HARI TERISI | BELUM TERISI | TOTAL DATA) */
+    .cal-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 0 0 12px;
+      width: 100%;
+    }
+    .cal-sum-card {
+      background: #f2faf6;
+      border: 1px solid #d7ece3;
+      border-radius: 13px;
+      padding: 13px 10px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+    .cal-sum-card strong {
+      font-size: 21px;
+      font-weight: 850;
+      color: #092b3a;
+      line-height: 1.15;
+      font-variant-numeric: tabular-nums;
+    }
+    .cal-sum-card small {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: #607783;
+      text-transform: uppercase;
+    }
+
+    /* HP Mode Vertikal (Portrait): Grafik Success Rate per Shift & Average per Line Muat Penuh Tanpa Geser Kanan */
+    @media (max-width: 600px) and (orientation: portrait) {
+      .bar-chart-wrap {
+        min-height: 0 !important;
+        overflow-x: hidden !important;
+      }
+      .bar-chart-wrap svg {
+        min-width: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+      }
+      .cal-legend-complete {
+        gap: 8px 12px;
+        font-size: 11px;
+      }
+      .cal-sum-card {
+        padding: 10px 6px;
+      }
+      .cal-sum-card strong {
+        font-size: 18px;
+      }
+      .cal-sum-card small {
+        font-size: 9px;
+      }
+    }
+
     /* Default (Desktop & Tablet Landscape): Sembunyikan Floating Bottom Nav */
     .pwa-floating-dock,
     .pwa-popup-menu,
@@ -158,14 +323,33 @@
 
       .control input,
       .control select,
+      .input-month-control input,
+      #inputCalendarMonth,
       input[type="date"],
       input[type="month"] {
         width: 100% !important;
         min-width: 0 !important;
         max-width: 100% !important;
+        height: 42px !important;
+        min-height: 42px !important;
         box-sizing: border-box !important;
-        font-size: 12.5px !important;
-        padding: 0 10px !important;
+        font-size: 13px !important;
+        padding: 0 12px !important;
+        border: 1px solid #dce7e5 !important;
+        border-radius: 10px !important;
+        background: #ffffff !important;
+        color: #102a37 !important;
+        box-shadow: 0 3px 12px #143d4808 !important;
+      }
+
+      .input-month-control label {
+        display: block !important;
+        margin-bottom: 5px !important;
+        color: #70858d !important;
+        font-size: 9px !important;
+        font-weight: 850 !important;
+        letter-spacing: 0.08em !important;
+        text-transform: uppercase !important;
       }
 
       #presentButton {
@@ -270,7 +454,79 @@
         width: 100% !important;
         min-width: 0 !important;
         max-width: 100% !important;
+        height: 42px !important;
+        min-height: 42px !important;
         box-sizing: border-box !important;
+      }
+
+      /* -------- TABEL HISTORI REPORT DAILY REPORT (HP VERTIKAL: GESER KANAN RAPI & JELAS) -------- */
+      .history-table-wrap,
+      .history-table-wrap .table-wrap {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        border-radius: 10px !important;
+      }
+
+      .history-table-wrap table {
+        width: 880px !important;
+        min-width: 880px !important;
+        table-layout: fixed !important;
+        font-size: 11.5px !important;
+      }
+
+      .history-table-wrap th,
+      .history-table-wrap td {
+        padding: 8px 6px !important;
+        font-size: 11px !important;
+        line-height: 1.35 !important;
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
+      }
+
+      .history-table-wrap th:nth-child(4),
+      .history-table-wrap th:nth-child(7),
+      .history-table-wrap td:nth-child(6) {
+        font-size: 10.5px !important;
+        line-height: 1.3 !important;
+      }
+
+      /* -------- PAGINATION HISTORI REPORT & DETAIL (HP VERTIKAL: MUAT PENUH & TIDAK KEPOTONG) -------- */
+      .detail-pagination,
+      #historyPagination {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-top: 12px !important;
+      }
+
+      .detail-page-info {
+        text-align: center !important;
+        width: 100% !important;
+        font-size: 11px !important;
+      }
+
+      .detail-pagination-pages {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      .detail-pagination button,
+      .detail-pagination-pages button {
+        padding: 6px 8px !important;
+        min-width: 28px !important;
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+        border-radius: 7px !important;
+        white-space: nowrap !important;
       }
 
       /* -------- EFEK BLUR LAYAR UTAMA SAAT POP-UP AKTIF -------- */
@@ -524,18 +780,24 @@
   `;
 
   function injectResponsiveStyle() {
-    if (document.getElementById('pwa-responsive-style')) return;
-    const style = document.createElement('style');
-    style.id = 'pwa-responsive-style';
-    style.textContent = RESPONSIVE_CSS;
-    (document.head || document.documentElement).appendChild(style);
+    let style = document.getElementById('pwa-responsive-style');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'pwa-responsive-style';
+      style.textContent = RESPONSIVE_CSS;
+    }
+    // Selalu pindahkan ke posisi paling akhir agar menang atas semua <style> halaman
+    const targetParent = document.body || document.head || document.documentElement;
+    if (targetParent && style.parentNode !== targetParent || (targetParent && targetParent.lastElementChild !== style)) {
+      targetParent.appendChild(style);
+    }
   }
 
   if (document.head) {
     injectResponsiveStyle();
-  } else {
-    document.addEventListener('DOMContentLoaded', injectResponsiveStyle);
   }
+  document.addEventListener('DOMContentLoaded', injectResponsiveStyle);
+  window.addEventListener('load', injectResponsiveStyle);
 
   // ===========================================================================
   // 3. FLOATING ORBS CONTROLLER (Hanya dipasang di Top Window / index.html)
@@ -553,7 +815,7 @@
         { id: 'input',     icon: '⇧', label: 'Input Data' },
         { id: 'history',   icon: '▤', label: 'Histori Data' },
         { id: 'download',  icon: '⇩', label: 'Unduh Grafik' },
-        { id: 'html-urls', icon: '🔗', label: 'Alamat HTML' }
+        { id: 'urls',      icon: '🔗', label: 'Alamat HTML' }
       ]
     };
 
