@@ -1,8 +1,9 @@
-const CACHE_NAME = 'inspection-workspace-v2';
+const CACHE_NAME = 'inspection-workspace-v7';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
   '/daily-report.html',
+  '/pwa-bridge.js?v=6',
   '/pwa-bridge.js',
   '/manifest.json',
   '/icon.svg'
@@ -11,7 +12,15 @@ const SHELL_ASSETS = [
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL_ASSETS)).catch(() => {})
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        SHELL_ASSETS.map((url) =>
+          fetch(url, { cache: 'reload' })
+            .then((res) => (res && res.ok ? cache.put(url, res) : null))
+            .catch(() => {})
+        )
+      )
+    )
   );
 });
 
@@ -27,14 +36,13 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Jangan pernah cache panggilan API database Google Apps Script
   if (req.method !== 'GET' || url.pathname.startsWith('/api/')) {
     return;
   }
 
-  // Network-first untuk HTML & JS agar update dari Vercel selalu langsung masuk, fallback ke cache jika offline
+  // Network-first dengan cache: 'no-cache' agar update dari Vercel selalu langsung tampil di HP
   event.respondWith(
-    fetch(req)
+    fetch(req, { cache: 'no-cache' })
       .then((res) => {
         if (res && res.status === 200 && url.origin === self.location.origin) {
           const clone = res.clone();
