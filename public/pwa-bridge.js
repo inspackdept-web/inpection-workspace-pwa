@@ -92,9 +92,9 @@
     window.google.script.run = createGasRunnerChain();
   }
 
-  // Pembersihan Cache Lama (v1-v7) & Registrasi Service Worker PWA v8
-  const CURRENT_SW_CACHE = 'inspection-workspace-v8';
-  const PURGE_FLAG_KEY = 'pwa_cache_purged_v8';
+  // Pembersihan Cache Lama (v1-v8) & Registrasi Service Worker PWA v9 (Pass-Through)
+  const CURRENT_SW_CACHE = 'inspection-workspace-v9';
+  const PURGE_FLAG_KEY = 'pwa_cache_purged_v9';
   if ('serviceWorker' in navigator && window.top === window.self) {
     (async function () {
       try {
@@ -102,10 +102,8 @@
         if ('caches' in window) {
           const keys = await caches.keys();
           for (let i = 0; i < keys.length; i++) {
-            if (keys[i] !== CURRENT_SW_CACHE) {
-              await caches.delete(keys[i]);
-              hadOldCache = true;
-            }
+            await caches.delete(keys[i]);
+            hadOldCache = true;
           }
         }
         if (localStorage.getItem(PURGE_FLAG_KEY) !== '1') {
@@ -119,7 +117,7 @@
             return;
           }
         }
-        const reg = await navigator.serviceWorker.register('/sw.js?v=8');
+        const reg = await navigator.serviceWorker.register('/sw.js?v=9');
         if (reg && typeof reg.update === 'function') reg.update();
       } catch (_err) {}
     })();
