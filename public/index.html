@@ -106,8 +106,15 @@
     .sev-cell strong { display:block; font-size:13px; font-weight:850; font-variant-numeric:tabular-nums; color:#0e2430; }
     .sev-cell.is-03 strong { color:#be123c; }
     .sev-cell.is-13 strong { color:#d97706; }
-    .corr-pill { display:inline-block; padding:2px 6px; border-radius:6px; font-size:10.5px; font-weight:750; background:#fff7ed; color:#b45309; border:1px solid #fed7aa; white-space:nowrap; }
+    .corr-pill { display:inline-block; padding:2px 5px; border-radius:6px; font-size:10px; font-weight:750; background:#fff7ed; color:#b45309; border:1px solid #fed7aa; white-space:nowrap; }
     .corr-pill.zero { background:#f1f5f9; color:#64748b; border-color:#e2e8f0; }
+    .line-summary-table { font-size:11px; }
+    .line-summary-table th,.line-summary-table td { padding:9px 4px; white-space:nowrap; }
+    .line-summary-table .line-pill { gap:5px; white-space:nowrap; }
+    .line-summary-row { cursor:pointer; transition:background .18s ease,transform .18s ease; }
+    .line-summary-row:hover { background:#eef8f5 !important; }
+    .line-summary-row:hover td:first-child .line-pill { color:#0f766e; transform:translateX(2px); }
+    .line-summary-row .line-pill { transition:transform .18s ease,color .18s ease; }
     .kpi-body { margin:10px 0 4px; }
     .kpi-value { margin:0; min-height:30px; display:flex; align-items:baseline; font-size:clamp(20px,1.85vw,25px); line-height:1.2; font-weight:850; letter-spacing:-.02em; color:#0e2430; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     #kpiDays { font-size:clamp(16px,1.4vw,20px); line-height:1.25; letter-spacing:-.015em; }
@@ -859,7 +866,7 @@
           </div>
           <div class="panel">
             <div class="panel-head"><div><h2>Rekap Success Rate &amp; Korelasi Daily Report</h2><p class="panel-sub">Success rate, kritis 0/3, dan problem Daily Report pada rentang tanggal yang sama</p></div></div>
-            <div class="table-wrap"><table class="data-table line-summary-table"><thead><tr><th>Line</th><th class="num">Inspeksi</th><th class="num">Gagal</th><th class="num">0/3</th><th class="num">Daily Prob</th><th class="num">Rate</th></tr></thead><tbody id="lineSummaryBody"><tr><td colspan="6" class="loading">Memuat data…</td></tr></tbody></table></div>
+            <div class="table-wrap"><table class="data-table line-summary-table"><thead><tr><th>Line</th><th class="num">Cek</th><th class="num">Gagal</th><th class="num">0/3</th><th class="num">Daily</th><th class="num">Rate</th></tr></thead><tbody id="lineSummaryBody"><tr><td colspan="6" class="loading">Memuat data…</td></tr></tbody></table></div>
           </div>
         </section>
         <section class="dashboard-grid line-analysis-grid">
@@ -1484,7 +1491,27 @@
       bindHistoryDateLinks($('historyContent'));
       openOverlay('historyOverlay');
     }
+    function openLineSummaryPopup(data, line) {
+      if (!data) return;
+      const summaryItem = (data.lineSummary || []).find((x) => String(x.line) === String(line)) || { line, totalSamples: 0, totalFailures: 0, successRate: 0, dailyProblems: 0, dailyLoss: 0, input03: 0 };
+      const series = (data.lineTrends || []).find((x) => String(x.line) === String(line));
+      STATE.currentHistoryDayData = null;
+      $('historyTitle').textContent = 'Rekap Line ' + line + ' · ' + formatCompactRange(data.startDate, data.endDate);
+      $('historySubtitle').textContent = 'Kritis 0/3: ' + numberFormat(summaryItem.input03 || 0) + ' sampel · Daily Report: ' + numberFormat(summaryItem.dailyProblems || 0) + ' problem (' + numberFormat(summaryItem.dailyLoss || 0) + ' menit). Klik baris tanggal untuk detail shift.';
+      if ($('exportDayExcelButton')) $('exportDayExcelButton').hidden = true;
+      if ($('printHistoryButton')) $('printHistoryButton').hidden = true;
+      const stats = '<div class="history-summary"><div class="history-stat"><small>Success Rate (Range)</small><strong class="' + (summaryItem.successRate < 95 ? 'rate-below-target' : '') + '">' + percent(summaryItem.successRate) + '</strong></div><div class="history-stat"><small>Total Inspeksi</small><strong>' + numberFormat(summaryItem.totalSamples) + '</strong></div><div class="history-stat"><small>Total Gagal · Daily Prob</small><strong>' + numberFormat(summaryItem.totalFailures) + ' · ' + numberFormat(summaryItem.dailyProblems || 0) + 'p</strong></div></div>';
+      const rows = (series && series.daily ? series.daily : []).filter(Boolean).map((item) => '<tr class="history-date-row" data-history-date="' + item.date + '" data-history-line="' + escapeHtml(line) + '" tabindex="0" role="button"><td>' + formatSingleDate(item.date) + '</td><td class="num">' + numberFormat(item.totalSamples) + '</td><td class="num">' + numberFormat(item.totalFailures) + '</td><td class="num rate-strong' + (item.successRate < 95 ? ' rate-below-target' : '') + '">' + percent(item.successRate) + '</td></tr>').join('');
+      $('historyContent').innerHTML = stats + '<div class="detail-table-scroll"><table class="data-table"><thead><tr><th>Tanggal</th><th class="num">Inspeksi</th><th class="num">Gagal</th><th class="num">Success Rate</th></tr></thead><tbody>' + (rows || '<tr><td colspan="4" class="loading">Belum ada data pada rentang ini.</td></tr>') + '</tbody></table></div>';
+      bindHistoryDateLinks($('historyContent'));
+      openOverlay('historyOverlay');
+    }
     document.addEventListener('click', (event) => {
+      const lineRow = event.target.closest('[data-line-summary]');
+      if (lineRow && STATE.dashboardData) {
+        openLineSummaryPopup(STATE.dashboardData, lineRow.dataset.lineSummary);
+        return;
+      }
       const sevBtn = event.target.closest('[data-sev-line]');
       if (sevBtn) {
         const parts = String(sevBtn.dataset.sevDate || '').split('-').map(Number);
@@ -1540,9 +1567,9 @@
       renderSrInsightsAndSeverity(data, effDate);
       $('lineSummaryBody').innerHTML=data.lineSummary.map((item)=>{
         const dp = Number(item.dailyProblems || 0), dl = Number(item.dailyLoss || 0), c03 = Number(item.input03 || 0);
-        const corrHtml = dp > 0 ? ('<span class="corr-pill" title="Daily Report: ' + dp + ' problem, ' + numberFormat(dl) + ' min">' + dp + ' prob · ' + numberFormat(dl) + 'm</span>') : '<span class="corr-pill zero">0</span>';
+        const corrHtml = dp > 0 ? ('<span class="corr-pill" title="Daily Report: ' + dp + ' problem, ' + numberFormat(dl) + ' min">' + dp + 'p · ' + numberFormat(dl) + 'm</span>') : '<span class="corr-pill zero">0</span>';
         const c03Html = c03 > 0 ? ('<b style="color:#be123c">' + numberFormat(c03) + '</b>') : '<span style="color:#94a3b8">0</span>';
-        return '<tr><td><span class="line-pill"><i class="line-mark" style="background:'+LINE_COLORS[item.line]+'"></i>Line '+escapeHtml(item.line)+'</span></td><td class="num">'+numberFormat(item.totalSamples)+'</td><td class="num">'+numberFormat(item.totalFailures)+'</td><td class="num">'+c03Html+'</td><td class="num">'+corrHtml+'</td><td class="num rate-strong'+(item.hasData&&item.successRate<95?' rate-below-target':'')+'">'+(item.hasData?percent(item.successRate):'—')+'</td></tr>';
+        return '<tr class="line-summary-row" data-line-summary="' + escapeHtml(item.line) + '" tabindex="0" role="button" title="Klik untuk melihat rincian harian Line ' + escapeHtml(item.line) + '"><td><span class="line-pill"><i class="line-mark" style="background:'+LINE_COLORS[item.line]+'"></i>Line '+escapeHtml(item.line)+'</span></td><td class="num">'+numberFormat(item.totalSamples)+'</td><td class="num">'+numberFormat(item.totalFailures)+'</td><td class="num">'+c03Html+'</td><td class="num">'+corrHtml+'</td><td class="num rate-strong'+(item.hasData&&item.successRate<95?' rate-below-target':'')+'">'+(item.hasData?percent(item.successRate):'—')+'</td></tr>';
       }).join('');
       const comments=data.comments||[];
       renderDashboardComments(comments.filter((item)=>item.chartType!=='line'),data.startDate,data.endDate,'daily');
