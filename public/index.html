@@ -110,6 +110,17 @@
     .kpi-hint { margin:3px 0 0; color:#708892; font-size:11.5px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .kpi-spark { margin-top:8px; height:36px; width:100%; display:block; }
     .kpi-spark svg { display:block; width:100%; height:36px; overflow:visible; }
+    @keyframes sparkDraw { from { stroke-dashoffset:1; } to { stroke-dashoffset:0; } }
+    @keyframes sparkFade { from { opacity:0; } to { opacity:1; } }
+    @keyframes sparkDotPop { from { opacity:0; transform:scale(0); } to { opacity:1; transform:scale(1); } }
+    @keyframes sparkBarRise { from { transform:scaleY(0); opacity:.35; } to { transform:scaleY(1); opacity:1; } }
+    @keyframes sevCardIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .spark-line { stroke-dasharray:1; stroke-dashoffset:1; animation:sparkDraw .8s cubic-bezier(.22,.75,.25,1) forwards; }
+    .spark-area { opacity:0; animation:sparkFade .65s ease .15s forwards; }
+    .spark-dot { transform-box:fill-box; transform-origin:center; opacity:0; animation:sparkDotPop .32s cubic-bezier(.2,.8,.2,1) .68s forwards; }
+    .spark-bar { transform-box:fill-box; transform-origin:center bottom; animation:sparkBarRise .65s cubic-bezier(.2,.75,.25,1) var(--sp-d,0s) both; }
+    .sev-card { animation:sevCardIn .45s cubic-bezier(.2,.75,.25,1) var(--sp-d,0s) both; }
+    @media(prefers-reduced-motion:reduce) { .spark-line,.spark-area,.spark-dot,.spark-bar,.sev-card { animation:none!important; opacity:1!important; stroke-dashoffset:0!important; transform:none!important; } }
     .shift-analysis-panel { width:100%; margin:0 0 16px; }
     .chart-mode-toggle { display:flex; gap:4px; padding:4px; border:1px solid var(--line); border-radius:10px; background:#f4f8f7; }
     .chart-mode-toggle button { min-height:34px; padding:0 12px; border:0; border-radius:7px; color:#5b737a; background:transparent; font-size:11px; font-weight:800; transition:color .2s,background .2s,box-shadow .2s; }
@@ -1349,7 +1360,7 @@
         const ty = (padTop + (1 - (targetVal - min) / span) * plotH).toFixed(1);
         targetLine = '<line x1="2" y1="' + ty + '" x2="178" y2="' + ty + '" stroke="#e11d48" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="3 3"/>';
       }
-      return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none"><defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + stroke + '" stop-opacity="0.26"/><stop offset="100%" stop-color="' + stroke + '" stop-opacity="0.01"/></linearGradient></defs>' + targetLine + '<path d="' + areaPath + '" fill="url(#' + gradId + ')"/><path d="' + linePath + '" fill="none" stroke="' + stroke + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="' + last.x.toFixed(1) + '" cy="' + last.y.toFixed(1) + '" r="2.8" fill="' + stroke + '" stroke="#fff" stroke-width="1.2"/></svg>';
+      return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none"><defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + stroke + '" stop-opacity="0.26"/><stop offset="100%" stop-color="' + stroke + '" stop-opacity="0.01"/></linearGradient></defs>' + targetLine + '<path class="spark-area" d="' + areaPath + '" fill="url(#' + gradId + ')"/><path class="spark-line" pathLength="1" d="' + linePath + '" fill="none" stroke="' + stroke + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle class="spark-dot" cx="' + last.x.toFixed(1) + '" cy="' + last.y.toFixed(1) + '" r="2.8" fill="' + stroke + '" stroke="#fff" stroke-width="1.2"/></svg>';
     }
     function buildSrRangeBars(trend) {
       const arr = trend || [];
@@ -1361,7 +1372,8 @@
         const bh = has ? Math.max(8, Math.round(((Math.max(70, Math.min(100, Number(pt.successRate))) - 70) / 30) * (h - 8)) + 6) : 5;
         const x = (i * (barW + gap)).toFixed(1), y = (h - bh).toFixed(1);
         const fill = has ? (Number(pt.successRate) < 95 ? '#e11d48' : '#0f766e') : '#e2ecea';
-        return '<rect x="' + x + '" y="' + y + '" width="' + barW.toFixed(1) + '" height="' + bh + '" rx="2" fill="' + fill + '" opacity="' + (has ? '0.88' : '0.75') + '"/>';
+        const dly = (i * 0.04).toFixed(2) + 's';
+        return '<rect class="spark-bar" style="--sp-d:' + dly + '" x="' + x + '" y="' + y + '" width="' + barW.toFixed(1) + '" height="' + bh + '" rx="2" fill="' + fill + '" opacity="' + (has ? '0.88' : '0.75') + '"/>';
       }).join('');
       return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' + rects + '</svg>';
     }
@@ -1413,6 +1425,11 @@
     function renderSrInsightsAndSeverity(data, effDate) {
       const strip = $('srAlertStrip');
       const sevGrid = $('srSeverityGrid');
+      const sevSub = $('srSeveritySub');
+      const fbNote = data.isFallbackDate ? (' (' + formatSingleShortDate(data.endDate) + ' belum terisi)') : '';
+      if (sevSub) {
+        sevSub.textContent = 'Distribusi input gagal per line pada tanggal ' + formatSingleDate(effDate) + fbNote + ' — 0/3 adalah prioritas tertinggi (lolos 3× cek)';
+      }
       const sev = data.failureSeverity && Array.isArray(data.failureSeverity.byLine) ? data.failureSeverity.byLine : [];
       const lowLines = (data.lowStreakLines || (data.endDateLineSummary || []).filter((x) => x.hasData && x.successRate < 95));
       const total03 = sev.reduce((s, x) => s + (Number(x.input03) || 0), 0);
@@ -1421,8 +1438,8 @@
           strip.hidden = false;
           const pills = [];
           lowLines.forEach((l) => pills.push('<span class="sr-alert-pill">Line ' + escapeHtml(l.line) + ' · ' + percent(l.successRate) + ' (&lt;95%)</span>'));
-          if (total03 > 0) pills.push('<span class="sr-alert-pill">Kritis 0/3: ' + numberFormat(total03) + ' sampel (range ini)</span>');
-          strip.innerHTML = '<span class="sr-alert-badge">⚠ Perhatian QA</span><span>Temuan pada ' + formatSingleShortDate(effDate) + ':</span>' + pills.join('');
+          if (total03 > 0) pills.push('<span class="sr-alert-pill">Kritis 0/3: ' + numberFormat(total03) + ' sampel</span>');
+          strip.innerHTML = '<span class="sr-alert-badge">⚠ Perhatian QA</span><span>Temuan pada ' + formatSingleShortDate(effDate) + fbNote + ':</span>' + pills.join('');
         } else {
           strip.hidden = true;
           strip.innerHTML = '';
@@ -1432,9 +1449,9 @@
         if (!sev.length) {
           sevGrid.innerHTML = '<div class="chart-empty" style="grid-column:1/-1;min-height:70px">Data detail 0/3 · 1/3 · 2/3 akan tampil setelah Worker diperbarui.</div>';
         } else {
-          sevGrid.innerHTML = sev.map((item) => {
+          sevGrid.innerHTML = sev.map((item, idx) => {
             const hasCrit = Number(item.input03) > 0;
-            return '<div class="sev-card' + (hasCrit ? ' has-crit' : '') + '">' +
+            return '<div class="sev-card' + (hasCrit ? ' has-crit' : '') + '" style="--sp-d:' + (idx * 0.05).toFixed(2) + 's">' +
               '<div class="sev-card-head"><span>Line ' + escapeHtml(item.line) + '</span><span class="sev-crit-tag' + (hasCrit ? '' : ' ok') + '">' + (hasCrit ? (numberFormat(item.input03) + ' Kritis') : 'Aman') + '</span></div>' +
               '<div class="sev-rows">' +
                 '<div class="sev-cell is-03"><small>0/3</small><strong>' + numberFormat(item.input03) + '</strong></div>' +
@@ -1477,7 +1494,7 @@
       $('kpiFailures').textContent=numberFormat(effFailures);
       const selectedDate=formatSingleShortDate(effDate);
       $('kpiRateHint').textContent='All machine · '+selectedDate+fallbackNote;
-      $('kpiSamplesHint').textContent=numberFormat(effSampleCount)+' sampel × 6 · '+selectedDate;
+      $('kpiSamplesHint').textContent=numberFormat(Math.round(effTotalInspections / 6))+' sampel × 6 · '+selectedDate;
       $('kpiFailuresHint').textContent='Gagal dari '+numberFormat(effTotalInspections)+' cek · '+selectedDate;
       $('kpiDays').textContent=formatCompactRange(data.startDate,data.endDate);
       if ($('kpiDaysHint')) $('kpiDaysHint').textContent=numberFormat(data.uploadedDays||0)+' dari '+numberFormat(data.spanDays||0)+' hari terisi';
