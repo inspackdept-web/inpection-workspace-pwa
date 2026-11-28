@@ -83,6 +83,26 @@
     .kpi-icon.tone-slate { background:#f1f5f9; color:#334155; }
     .btn-svg-ico { display:inline-flex; align-items:center; justify-content:center; gap:7px; }
     .btn-svg-ico svg { width:15px; height:15px; flex:none; }
+    .sr-alert-strip { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:11px 15px; margin-bottom:16px; border-radius:12px; background:linear-gradient(90deg,#fff1f2,#fff7ed); border:1px solid #fecdd3; color:#9f1239; font-size:12px; line-height:1.4; }
+    .sr-alert-strip[hidden] { display:none; }
+    .sr-alert-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; background:#ffe4e6; color:#be123c; font-size:10.5px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; flex:none; }
+    .sr-alert-pill { display:inline-flex; align-items:center; gap:5px; padding:2px 9px; border-radius:8px; background:#fff; border:1px solid #fda4af; color:#881337; font-weight:750; font-size:11px; }
+    .sev-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:10px; }
+    @media(max-width:960px){ .sev-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    @media(max-width:600px){ .sev-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    .sev-card { padding:11px 12px; border-radius:11px; border:1px solid var(--line); background:#f8fbfa; display:flex; flex-direction:column; gap:6px; }
+    .sev-card.has-crit { border-color:#fecdd3; background:#fff7f8; }
+    .sev-card-head { display:flex; justify-content:space-between; align-items:center; font-size:11.5px; font-weight:800; color:#1e3a46; }
+    .sev-crit-tag { padding:1px 6px; border-radius:999px; font-size:10px; font-weight:800; background:#ffe4e6; color:#be123c; }
+    .sev-crit-tag.ok { background:#ecfdf5; color:#047857; }
+    .sev-rows { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; text-align:center; }
+    .sev-cell { padding:4px 2px; border-radius:7px; background:#fff; border:1px solid #e6efed; }
+    .sev-cell small { display:block; font-size:9px; color:#64748b; font-weight:700; }
+    .sev-cell strong { display:block; font-size:13px; font-weight:850; font-variant-numeric:tabular-nums; color:#0e2430; }
+    .sev-cell.is-03 strong { color:#be123c; }
+    .sev-cell.is-13 strong { color:#d97706; }
+    .corr-pill { display:inline-block; padding:2px 6px; border-radius:6px; font-size:10.5px; font-weight:750; background:#fff7ed; color:#b45309; border:1px solid #fed7aa; white-space:nowrap; }
+    .corr-pill.zero { background:#f1f5f9; color:#64748b; border-color:#e2e8f0; }
     .kpi-body { margin:10px 0 4px; }
     .kpi-value { margin:0; min-height:30px; display:flex; align-items:baseline; font-size:clamp(20px,1.85vw,25px); line-height:1.2; font-weight:850; letter-spacing:-.02em; color:#0e2430; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     #kpiDays { font-size:clamp(16px,1.4vw,20px); line-height:1.25; letter-spacing:-.015em; }
@@ -804,10 +824,15 @@
             <div class="kpi-spark" id="sparkSrRange"></div>
           </div>
         </section>
+        <div id="srAlertStrip" class="sr-alert-strip" hidden></div>
         <section class="panel shift-analysis-panel">
           <div class="panel-head"><div><h2 id="shiftAnalysisTitle">Success Rate per Shift</h2><p id="shiftAnalysisSubtitle" class="panel-sub">Gabungan seluruh area per line dan shift pada rentang terpilih</p></div><div class="chart-mode-toggle" role="group" aria-label="Pilih grafik analisis"><button type="button" class="active" data-analysis-mode="shift">Per Shift</button><button type="button" data-analysis-mode="line">Average per Line</button></div></div>
           <div id="shiftAnalysisChart" class="bar-chart-wrap"><div class="loading">Memuat grafik…</div></div>
           <div id="shiftAnalysisLegend" class="bar-chart-legend"></div>
+        </section>
+        <section class="panel" id="srSeverityPanel" style="margin-bottom:16px">
+          <div class="panel-head"><div><h2>Analisis Kegagalan Kritis (0/3 · 1/3 · 2/3)</h2><p class="panel-sub" id="srSeveritySub">Distribusi input gagal per line pada rentang terpilih — 0/3 adalah prioritas tertinggi (lolos 3× cek)</p></div></div>
+          <div id="srSeverityGrid" class="sev-grid"><div class="loading">Memuat analisis…</div></div>
         </section>
         <section class="dashboard-grid">
           <div class="panel">
@@ -817,8 +842,8 @@
             <div id="dashboardComments" class="dashboard-comments"><div class="panel-sub">Komentar tanggal terpilih akan tampil di sini.</div></div>
           </div>
           <div class="panel">
-            <div class="panel-head"><div><h2>Rekap Success Rate</h2><p class="panel-sub">Success rate dan jumlah sampel pada rentang terpilih</p></div></div>
-            <div class="table-wrap"><table class="data-table line-summary-table"><thead><tr><th>Line</th><th class="num">Sampel</th><th class="num">Gagal</th><th class="num">Rate</th></tr></thead><tbody id="lineSummaryBody"><tr><td colspan="4" class="loading">Memuat data…</td></tr></tbody></table></div>
+            <div class="panel-head"><div><h2>Rekap Success Rate &amp; Korelasi Daily Report</h2><p class="panel-sub">Success rate, kritis 0/3, dan problem Daily Report pada rentang tanggal yang sama</p></div></div>
+            <div class="table-wrap"><table class="data-table line-summary-table"><thead><tr><th>Line</th><th class="num">Inspeksi</th><th class="num">Gagal</th><th class="num">0/3</th><th class="num">Daily Prob</th><th class="num">Rate</th></tr></thead><tbody id="lineSummaryBody"><tr><td colspan="6" class="loading">Memuat data…</td></tr></tbody></table></div>
           </div>
         </section>
         <section class="dashboard-grid line-analysis-grid">
@@ -1011,7 +1036,7 @@
 
   <div id="historyOverlay" class="overlay" role="presentation">
     <section class="dialog wide" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
-      <div class="dialog-head"><div><div class="eyebrow">Histori Success Rate</div><h2 id="historyTitle">Data Harian</h2><p id="historySubtitle" class="dialog-sub"></p></div><div class="history-head-actions"><button id="exportDayExcelButton" class="button button-primary" type="button" hidden>📊 Export Excel</button><button id="printHistoryButton" class="button button-secondary" type="button" hidden>Cetak</button><button class="close-button" type="button" data-close="historyOverlay" aria-label="Tutup">×</button></div></div>
+      <div class="dialog-head"><div><div class="eyebrow">Histori Success Rate</div><h2 id="historyTitle">Data Harian</h2><p id="historySubtitle" class="dialog-sub"></p></div><div class="history-head-actions"><button id="exportDayExcelButton" class="button button-primary btn-svg-ico" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8"/><path d="M8 17h8"/></svg><span>Export Excel</span></button><button id="printHistoryButton" class="button button-secondary btn-svg-ico" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span>Cetak</span></button><button class="close-button" type="button" data-close="historyOverlay" aria-label="Tutup">×</button></div></div>
       <div id="historyContent"><div class="loading">Memuat detail…</div></div>
     </section>
   </div>
@@ -1385,14 +1410,50 @@
       if ($('sparkSrFailures')) $('sparkSrFailures').innerHTML = buildSrSparkArea(dailyFailures, '#e11d48', 'srSpFail', null);
       if ($('sparkSrRange')) $('sparkSrRange').innerHTML = buildSrRangeBars(trend);
     }
+    function renderSrInsightsAndSeverity(data, effDate) {
+      const strip = $('srAlertStrip');
+      const sevGrid = $('srSeverityGrid');
+      const sev = data.failureSeverity && Array.isArray(data.failureSeverity.byLine) ? data.failureSeverity.byLine : [];
+      const lowLines = (data.lowStreakLines || (data.endDateLineSummary || []).filter((x) => x.hasData && x.successRate < 95));
+      const total03 = sev.reduce((s, x) => s + (Number(x.input03) || 0), 0);
+      if (strip) {
+        if (lowLines.length || total03 > 0) {
+          strip.hidden = false;
+          const pills = [];
+          lowLines.forEach((l) => pills.push('<span class="sr-alert-pill">Line ' + escapeHtml(l.line) + ' · ' + percent(l.successRate) + ' (&lt;95%)</span>'));
+          if (total03 > 0) pills.push('<span class="sr-alert-pill">Kritis 0/3: ' + numberFormat(total03) + ' sampel (range ini)</span>');
+          strip.innerHTML = '<span class="sr-alert-badge">⚠ Perhatian QA</span><span>Temuan pada ' + formatSingleShortDate(effDate) + ':</span>' + pills.join('');
+        } else {
+          strip.hidden = true;
+          strip.innerHTML = '';
+        }
+      }
+      if (sevGrid) {
+        if (!sev.length) {
+          sevGrid.innerHTML = '<div class="chart-empty" style="grid-column:1/-1;min-height:70px">Data detail 0/3 · 1/3 · 2/3 akan tampil setelah Worker diperbarui.</div>';
+        } else {
+          sevGrid.innerHTML = sev.map((item) => {
+            const hasCrit = Number(item.input03) > 0;
+            return '<div class="sev-card' + (hasCrit ? ' has-crit' : '') + '">' +
+              '<div class="sev-card-head"><span>Line ' + escapeHtml(item.line) + '</span><span class="sev-crit-tag' + (hasCrit ? '' : ' ok') + '">' + (hasCrit ? (numberFormat(item.input03) + ' Kritis') : 'Aman') + '</span></div>' +
+              '<div class="sev-rows">' +
+                '<div class="sev-cell is-03"><small>0/3</small><strong>' + numberFormat(item.input03) + '</strong></div>' +
+                '<div class="sev-cell is-13"><small>1/3</small><strong>' + numberFormat(item.input13) + '</strong></div>' +
+                '<div class="sev-cell"><small>2/3</small><strong>' + numberFormat(item.input23) + '</strong></div>' +
+              '</div></div>';
+          }).join('');
+        }
+      }
+    }
     function renderDashboard(data) {
       STATE.dashboardData=data;
       let effRate = Number(data.successRate) || 0;
-      let effSamples = Number(data.totalSampleCount) || 0;
+      let effTotalInspections = Number(data.totalSamples) || 0;
+      let effSampleCount = Number(data.totalSampleCount) || 0;
       let effFailures = Number(data.totalFailures) || 0;
-      let effDate = data.endDate;
-      let fallbackNote = '';
-      if (!data.totalSamples && !data.totalFailures && data.uploadedDays > 0 && Array.isArray(data.dailyTrend)) {
+      let effDate = data.effectiveEndDate || data.endDate;
+      let fallbackNote = data.isFallbackDate ? (' (' + formatSingleShortDate(data.endDate).split(' ').slice(0, 2).join(' ') + ' belum terisi)') : '';
+      if (!effTotalInspections && !effFailures && data.uploadedDays > 0 && Array.isArray(data.dailyTrend)) {
         for (let i = data.dailyTrend.length - 1; i >= 0; i--) {
           if (data.dailyTrend[i] && data.dailyTrend[i].successRate != null) {
             effDate = data.dailyTrend[i].date;
@@ -1402,7 +1463,8 @@
               const d = lt.daily && lt.daily[i];
               if (d) { sTot += Number(d.totalSamples) || 0; fTot += Number(d.totalFailures) || 0; }
             });
-            effSamples = Math.round(sTot / 6);
+            effTotalInspections = sTot;
+            effSampleCount = Math.round(sTot / 6);
             effFailures = fTot;
             fallbackNote = ' (' + formatSingleShortDate(data.endDate).split(' ').slice(0, 2).join(' ') + ' belum terisi)';
             break;
@@ -1411,16 +1473,22 @@
       }
       $('kpiRate').textContent=percent(effRate);
       $('kpiRate').classList.toggle('rate-below-target',effRate<95);
-      $('kpiSamples').textContent=numberFormat(effSamples);
+      $('kpiSamples').textContent=numberFormat(effTotalInspections);
       $('kpiFailures').textContent=numberFormat(effFailures);
       const selectedDate=formatSingleShortDate(effDate);
       $('kpiRateHint').textContent='All machine · '+selectedDate+fallbackNote;
-      $('kpiSamplesHint').textContent='Total sampel · '+selectedDate;
-      $('kpiFailuresHint').textContent='Sampel gagal · '+selectedDate;
+      $('kpiSamplesHint').textContent=numberFormat(effSampleCount)+' sampel × 6 · '+selectedDate;
+      $('kpiFailuresHint').textContent='Gagal dari '+numberFormat(effTotalInspections)+' cek · '+selectedDate;
       $('kpiDays').textContent=formatCompactRange(data.startDate,data.endDate);
       if ($('kpiDaysHint')) $('kpiDaysHint').textContent=numberFormat(data.uploadedDays||0)+' dari '+numberFormat(data.spanDays||0)+' hari terisi';
       renderSrKpiSparks(Object.assign({}, data, { successRate: effRate }));
-      $('lineSummaryBody').innerHTML=data.lineSummary.map((item)=>'<tr><td><span class="line-pill"><i class="line-mark" style="background:'+LINE_COLORS[item.line]+'"></i>Line '+escapeHtml(item.line)+'</span></td><td class="num">'+numberFormat(item.totalSamples)+'</td><td class="num">'+numberFormat(item.totalFailures)+'</td><td class="num rate-strong'+(item.hasData&&item.successRate<95?' rate-below-target':'')+'">'+(item.hasData?percent(item.successRate):'—')+'</td></tr>').join('');
+      renderSrInsightsAndSeverity(data, effDate);
+      $('lineSummaryBody').innerHTML=data.lineSummary.map((item)=>{
+        const dp = Number(item.dailyProblems || 0), dl = Number(item.dailyLoss || 0), c03 = Number(item.input03 || 0);
+        const corrHtml = dp > 0 ? ('<span class="corr-pill" title="Daily Report: ' + dp + ' problem, ' + numberFormat(dl) + ' min">' + dp + ' prob · ' + numberFormat(dl) + 'm</span>') : '<span class="corr-pill zero">0</span>';
+        const c03Html = c03 > 0 ? ('<b style="color:#be123c">' + numberFormat(c03) + '</b>') : '<span style="color:#94a3b8">0</span>';
+        return '<tr><td><span class="line-pill"><i class="line-mark" style="background:'+LINE_COLORS[item.line]+'"></i>Line '+escapeHtml(item.line)+'</span></td><td class="num">'+numberFormat(item.totalSamples)+'</td><td class="num">'+numberFormat(item.totalFailures)+'</td><td class="num">'+c03Html+'</td><td class="num">'+corrHtml+'</td><td class="num rate-strong'+(item.hasData&&item.successRate<95?' rate-below-target':'')+'">'+(item.hasData?percent(item.successRate):'—')+'</td></tr>';
+      }).join('');
       const comments=data.comments||[];
       renderDashboardComments(comments.filter((item)=>item.chartType!=='line'),data.startDate,data.endDate,'daily');
       renderDashboardComments(comments.filter((item)=>item.chartType==='line'),data.startDate,data.endDate,'line');
@@ -1435,10 +1503,12 @@
     }
     function renderShiftAnalysisChart(data) {
       const shiftMode=STATE.analysisChartMode==='shift';
+      const effDate=data.effectiveEndDate||data.endDate;
+      const fbNote=data.isFallbackDate?' ('+formatSingleShortDate(data.endDate)+' belum terisi)':'';
       $('shiftAnalysisTitle').textContent=shiftMode?'Success Rate per Shift':'Average Success Rate per Line';
       $('shiftAnalysisSubtitle').textContent=shiftMode
-        ?'Gabungan seluruh area/machine per line dan shift pada tanggal '+formatSingleDate(data.endDate)
-        :'Success rate tiap line pada tanggal '+formatSingleDate(data.endDate);
+        ?'Gabungan seluruh area/machine per line dan shift pada tanggal '+formatSingleDate(effDate)+fbNote
+        :'Success rate tiap line pada tanggal '+formatSingleDate(effDate)+fbNote;
       document.querySelectorAll('[data-analysis-mode]').forEach((button)=>button.classList.toggle('active',button.dataset.analysisMode===STATE.analysisChartMode));
       if(shiftMode){
         const groups=(data.shiftSummary||[]).map((line)=>({
@@ -2035,7 +2105,7 @@
     function renderHistoryData(data) {
       if(!data.found){STATE.currentHistoryDayData=null;if($('exportDayExcelButton'))$('exportDayExcelButton').hidden=true;$('historyContent').innerHTML='<div class="loading">Belum ada data tersimpan untuk tanggal ini.</div>';return;}
       STATE.currentHistoryDayData=data;
-      const stats='<div class="history-summary"><div class="history-stat"><small>Success Rate</small><strong class="'+(data.successRate*100<95?'rate-below-target':'')+'">'+percent(data.successRate*100)+'</strong></div><div class="history-stat"><small>Total Sampel</small><strong>'+numberFormat(data.totalSampleCount)+'</strong></div><div class="history-stat"><small>Total Sampel Gagal</small><strong>'+numberFormat(data.totalFailures)+'</strong></div></div>';
+      const stats='<div class="history-summary"><div class="history-stat"><small>Success Rate</small><strong class="'+(data.successRate*100<95?'rate-below-target':'')+'">'+percent(data.successRate*100)+'</strong></div><div class="history-stat"><small>Total Inspeksi ('+numberFormat(Math.round((Number(data.totalSamples)||0)/6))+' sampel × 6)</small><strong>'+numberFormat(data.totalSamples)+'</strong></div><div class="history-stat"><small>Total Sampel Gagal</small><strong>'+numberFormat(data.totalFailures)+'</strong></div></div>';
       const lineAverages=makeLineAverageSummary(data.lineSummary||data.items);
       const rows=data.items.map((item)=>'<tr><td>'+escapeHtml(historyLineLabel(item))+'</td><td>'+escapeHtml(item.shift)+'</td><td class="num">'+numberFormat(item.sampleCount)+'</td><td class="num">'+numberFormat(item.totalSamples)+'</td><td class="num">'+numberFormat(item.sample03)+'</td><td class="num">'+numberFormat(item.sample13)+'</td><td class="num">'+numberFormat(item.sample23)+'</td><td class="num">'+numberFormat(item.totalFailures)+'</td><td class="num rate-strong'+(item.successRate*100<95?' rate-below-target':'')+'">'+percent(item.successRate*100)+'</td></tr>').join('');
       $('historySubtitle').textContent='Sumber file: '+(data.fileName||'Excel')+' · Disimpan '+(data.uploadedAt||'');
