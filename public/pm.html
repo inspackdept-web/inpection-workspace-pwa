@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plan Maintenance (PM) | PT KCI Inspection Workspace</title>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <style>
+    :root{
+      --bg:#f4f8f7;--surface:#ffffff;--ink:#0e2430;--muted:#647b85;--line:#dce7e5;
+      --teal:#0f766e;--teal-2:#14b8a6;--navy:#0b2833;--navy-2:#123847;
+      --rose:#e11d48;--rose-bg:#fff1f2;--rose-bd:#fecdd3;
+      --amber:#d97706;--amber-bg:#fffbeb;--amber-bd:#fde68a;
+      --emerald:#059669;--emerald-bg:#ecfdf5;--emerald-bd:#a7f3d0;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:13.5px;line-height:1.45}
+    .shell{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+    .sidebar{background:linear-gradient(180deg,var(--navy) 0%,#082029 100%);color:#e6f4f1;padding:20px 14px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh}
+    .brand{display:flex;align-items:center;gap:10px;padding:4px 8px}
+    .brand-mark{width:38px;height:38px;border-radius:10px;background:#123c49;border:1px solid #1e596b;display:flex;align-items:center;justify-content:center;flex:none}
+    .brand-copy strong{display:block;font-size:14px;letter-spacing:.02em;color:#fff}
+    .brand-copy small{display:block;font-size:10.5px;color:#8cc7b7;letter-spacing:.04em}
+    .nav-title{font-size:10px;font-weight:800;letter-spacing:.12em;color:#6fa49a;padding:0 10px;margin-bottom:-8px}
+    .nav{display:flex;flex-direction:column;gap:4px}
+    .nav button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:none;border-radius:10px;background:transparent;color:#c3ded9;font-size:13px;font-weight:650;text-align:left;cursor:pointer;transition:background .16s ease,color .16s ease}
+    .nav button:hover{background:#123847;color:#fff}
+    .nav button.active{background:linear-gradient(90deg,#126f67,#158a7f);color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.22)}
+    .nav button .nav-badge{margin-left:auto;padding:1px 7px;border-radius:999px;background:#e11d48;color:#fff;font-size:10.5px;font-weight:800}
+    .side-note{margin-top:auto;padding:12px;border-radius:10px;background:#0d313e;border:1px solid #174656;font-size:11px;color:#9cc2bc;line-height:1.45}
+    .main{padding:18px 22px 32px;min-width:0}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+    .eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.11em;color:var(--teal);text-transform:uppercase}
+    .topbar h2{margin:2px 0 0;font-size:22px;font-weight:850;letter-spacing:-.02em}
+    .topbar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .project-switcher{display:inline-flex;align-items:center;gap:4px;padding:4px;background:#e7f0ee;border:1px solid #d1e2df;border-radius:11px}
+    .project-tab{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:none;border-radius:8px;background:transparent;color:#3d5b66;font-size:12px;font-weight:750;cursor:pointer;white-space:nowrap;transition:all .16s ease}
+    .project-tab:hover{color:#0e2430;background:rgba(255,255,255,.55)}
+    .project-tab.active{background:#fff;color:#0e2430;box-shadow:0 2px 8px rgba(14,36,48,.09)}
+    .pm-tab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#e11d48;color:#fff;font-size:10px;font-weight:850;line-height:1}
+    .pm-tab-badge[hidden]{display:none}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:9px;border:1px solid transparent;font-size:12.5px;font-weight:750;cursor:pointer;transition:transform .14s ease,box-shadow .14s ease,background .14s ease}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{background:linear-gradient(135deg,#0f766e,#149689);color:#fff;box-shadow:0 3px 10px rgba(15,118,110,.22)}
+    .btn-primary:hover{filter:brightness(1.06)}
+    .btn-secondary{background:#fff;color:#1b3b47;border-color:#cddede}
+    .btn-secondary:hover{background:#f0f7f5;border-color:#9fc5be}
+    .btn-danger{background:#fff1f2;color:#be123c;border-color:#fecdd3}
+    .btn-danger:hover{background:#ffe4e6}
+    .btn-sm{padding:5px 9px;font-size:11.5px;border-radius:7px}
+    .btn-done{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+    .btn-done:hover{background:#d1fae5}
+
+    .section{display:none}
+    .section.active{display:block;animation:fadeSlide .22s ease}
+    @keyframes fadeSlide{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+    .alert-banner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;margin-bottom:16px;border-radius:12px;background:linear-gradient(90deg,#fff1f2,#fffbeb);border:1px solid #fecdd3;color:#9f1239;font-size:12.5px}
+    .alert-banner.is-warn{background:linear-gradient(90deg,#fffbeb,#fff7ed);border-color:#fde68a;color:#92400e}
+    .alert-banner[hidden]{display:none}
+    .alert-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:#e11d48;color:#fff;font-size:10.5px;font-weight:850;letter-spacing:.04em;text-transform:uppercase;flex:none}
+    .alert-banner.is-warn .alert-badge{background:#d97706}
+    .alert-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:8px;background:#fff;border:1px solid #fda4af;color:#881337;font-size:11.5px;font-weight:750;cursor:pointer;transition:transform .14s ease,background .14s ease}
+    .alert-pill:hover{background:#ffe4e6;transform:translateY(-1px)}
+    .alert-pill.is-soon{border-color:#fcd34d;color:#92400e}
+    .alert-pill.is-soon:hover{background:#fef3c7}
+
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}
+    .kpi-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px 12px;cursor:pointer;transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s ease,border-color .2s ease;display:flex;flex-direction:column;justify-content:space-between;min-height:118px}
+    .kpi-card:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(14,36,48,.09);border-color:#8fd3c2}
+    .kpi-card.is-active{border-color:var(--teal);box-shadow:0 0 0 2px rgba(15,118,110,.16)}
+    .kpi-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .kpi-label{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#5a747f}
+    .kpi-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none}
+    .kpi-icon svg{width:17px;height:17px;stroke-width:2}
+    .tone-rose{background:var(--rose-bg);color:var(--rose)}
+    .tone-amber{background:var(--amber-bg);color:var(--amber)}
+    .tone-emerald{background:var(--emerald-bg);color:var(--emerald)}
+    .tone-teal{background:#ecfdf5;color:var(--teal)}
+    .kpi-value{font-size:24px;font-weight:850;letter-spacing:-.02em;color:var(--ink);margin:6px 0 2px;font-variant-numeric:tabular-nums}
+    .kpi-hint{font-size:11.5px;color:var(--muted)}
+
+    .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 3px 12px rgba(14,36,48,.04);margin-bottom:16px}
+    .panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+    .panel-head h3{margin:0;font-size:15.5px;font-weight:800}
+    .panel-sub{margin:3px 0 0;font-size:12px;color:var(--muted)}
+
+    .filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+    .filter-bar input,.filter-bar select{padding:7px 10px;border:1px solid #cfe0dd;border-radius:8px;background:#fff;color:var(--ink);font-size:12.5px}
+    .filter-bar input[type="search"]{min-width:190px;flex:1;max-width:280px}
+
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:12.5px}
+    th{text-align:left;padding:9px 10px;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5a747f;border-bottom:1px solid var(--line);white-space:nowrap}
+    td{padding:10px;border-bottom:1px solid #eef4f3;vertical-align:middle}
+    tbody tr{transition:background .14s ease}
+    tbody tr:hover{background:#f3faf8}
+    tbody tr.row-overdue{background:#fff8f8}
+    tbody tr.row-overdue:hover{background:#fff1f2}
+
+    .status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap}
+    .status-pill.overdue{background:var(--rose-bg);color:#be123c;border:1px solid var(--rose-bd)}
+    .status-pill.due_soon{background:var(--amber-bg);color:#b45309;border:1px solid var(--amber-bd)}
+    .status-pill.ok{background:var(--emerald-bg);color:#047857;border:1px solid var(--emerald-bd)}
+
+    .prog-wrap{min-width:130px}
+    .prog-meta{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:4px;font-size:11px;font-variant-numeric:tabular-nums}
+    .prog-track{height:6px;border-radius:99px;background:#e4efed;overflow:hidden}
+    .prog-fill{height:100%;border-radius:99px;transform-origin:left center;animation:barGrow .55s cubic-bezier(.22,.75,.25,1) both}
+    .prog-fill.overdue{background:linear-gradient(90deg,#e11d48,#fb7185)}
+    .prog-fill.due_soon{background:linear-gradient(90deg,#d97706,#fbbf24)}
+    .prog-fill.ok{background:linear-gradient(90deg,#0f766e,#14b8a6)}
+    @keyframes barGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+    .corr-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:750;background:#fff7ed;color:#b45309;border:1px solid #fed7aa;white-space:nowrap}
+    .corr-badge.zero{background:#f1f5f9;color:#64748b;border-color:#e2e8f0}
+    .row-actions{display:flex;gap:5px;white-space:nowrap}
+    .empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:13px}
+
+    .parts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+    .part-card{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fbfdfd}
+    .part-card strong{display:block;font-size:12.5px;color:var(--ink)}
+    .part-card small{display:block;font-size:11px;color:var(--muted)}
+    .part-tag{font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:#e7f3f1;color:#0f766e}
+    .part-tag.custom{background:#eff6ff;color:#1d4ed8}
+
+    dialog{border:none;border-radius:16px;padding:0;max-width:580px;width:calc(100% - 28px);box-shadow:0 22px 60px rgba(8,32,41,.28);color:var(--ink)}
+    dialog::backdrop{background:rgba(8,32,41,.52);backdrop-filter:blur(2px)}
+    .dlg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px 12px;border-bottom:1px solid var(--line)}
+    .dlg-head h3{margin:2px 0 0;font-size:17px;font-weight:850}
+    .dlg-body{padding:16px 20px;max-height:70vh;overflow-y:auto}
+    .dlg-foot{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:12px 20px 16px;border-top:1px solid var(--line);background:#f9fcfb}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .field{display:flex;flex-direction:column;gap:4px}
+    .field.full{grid-column:1 / -1}
+    .field label{font-size:11px;font-weight:800;letter-spacing:.05em;color:#47636e;text-transform:uppercase}
+    .field input,.field select,.field textarea{padding:8px 10px;border:1px solid #c9dcd9;border-radius:8px;font-size:13px;font-family:inherit;color:var(--ink);background:#fff}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:2px solid rgba(15,118,110,.25);border-color:var(--teal)}
+    .preset-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+    .preset-btn{padding:3px 8px;border-radius:6px;border:1px solid #cfe0dd;background:#f4f9f8;color:#28505c;font-size:11px;font-weight:750;cursor:pointer}
+    .preset-btn:hover{background:#dff2ee;border-color:var(--teal)}
+    .bulk-lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+    .bulk-line-box{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#f9fcfb}
+    .bulk-line-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-weight:800;font-size:12px}
+    .bulk-machines{display:flex;flex-wrap:wrap;gap:6px}
+    .bulk-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border:1px solid #cfe0dd;border-radius:7px;background:#fff;font-size:11.5px;font-weight:700;cursor:pointer;user-select:none}
+    .bulk-chip input{margin:0}
+    .bulk-chip:has(input:checked){background:#e6f6f3;border-color:var(--teal);color:#0f514a}
+    .status-msg{font-size:12px;color:var(--muted);margin-right:auto}
+    .status-msg.err{color:#be123c;font-weight:700}
+    .toast{position:fixed;bottom:20px;right:20px;padding:11px 16px;border-radius:10px;background:var(--navy);color:#fff;font-size:12.5px;font-weight:700;box-shadow:0 10px 26px rgba(0,0,0,.22);opacity:0;transform:translateY(10px);pointer-events:none;transition:all .22s ease;z-index:99}
+    .toast.show{opacity:1;transform:none}
+
+    @media(max-width:960px){.shell{grid-template-columns:1fr}.sidebar{position:static;height:auto;flex-direction:row;align-items:center;flex-wrap:wrap;padding:12px 14px;gap:10px}.nav{flex-direction:row;flex-wrap:wrap}.nav-title,.side-note{display:none}.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:600px){.main{padding:12px}.form-grid{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#70d9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      </div>
+      <div class="brand-copy">
+        <strong>PT KCI · PM</strong>
+        <small>Plan Maintenance</small>
+      </div>
+    </div>
+    <div class="nav-title">MENU PM</div>
+    <nav class="nav">
+      <button type="button" class="active" data-page="schedules"><span>📅</span><span>Jadwal PM</span><span id="navAlertBadge" class="nav-badge" hidden>0</span></button>
+      <button type="button" data-page="parts"><span>🧩</span><span>Master Part</span></button>
+      <button type="button" data-page="logs"><span>📜</span><span>Riwayat PM</span></button>
+    </nav>
+    <div class="side-note">
+      <strong>PLAN MAINTENANCE</strong><br>
+      Pantau siklus PM part (>150 hari), due date otomatis, korelasi problem Daily Report &amp; riwayat pengerjaan.
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">PREVENTIVE MAINTENANCE</div>
+        <h2 id="pageTitle">Jadwal Plan Maintenance</h2>
+      </div>
+      <div class="topbar-actions">
+        <div class="project-switcher" role="tablist" aria-label="Pilih Project">
+          <button type="button" class="project-tab" onclick="switchParentTab('daily')"><span>📊</span><span>Daily Report</span></button>
+          <button type="button" class="project-tab" onclick="switchParentTab('success')"><span>📈</span><span>Success Rate</span></button>
+          <button type="button" class="project-tab active" aria-selected="true"><span>🛠️</span><span>Plan Maintenance</span><span id="pmTabBadge" class="pm-tab-badge" hidden>0</span></button>
+        </div>
+        <button type="button" class="btn btn-secondary" id="openBulkBtn">+ Tambah Massal</button>
+        <button type="button" class="btn btn-primary" id="openAddBtn">+ Tambah Jadwal PM</button>
+      </div>
+    </header>
+
+    <!-- PAGE 1: JADWAL PM -->
+    <section class="section active" id="page-schedules">
+      <div id="pmAlertBanner" class="alert-banner" hidden></div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card" data-kpi-filter="overdue" tabindex="0" role="button" title="Klik untuk menyaring part yang telat PM">
+          <div class="kpi-head"><span class="kpi-label">Overdue (Telat)</span><span class="kpi-icon tone-rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span></div>
+          <div class="kpi-value" id="kpiOverdue">0</div>
+          <div class="kpi-hint">Sudah melewati Due Date</div>
+        </div>
+        <div class="kpi-card" data-kpi-filter="due_soon" tabindex="0" role="button" title="Klik untuk menyaring part yang segera jatuh tempo">
+          <div class="kpi-head"><span class="kpi-label">Segera PM</span><span class="kpi-icon tone-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span></div>
+          <div class="kpi-value" id="kpiDueSoon">0</div>
+          <div class="kpi-hint">Masuk masa peringatan (H-lead)</div>
+        </div>
+        <div class="kpi-card" data-kpi-filter="ok" tabindex="0" role="button" title="Klik untuk menyaring part dengan status aman">
+          <div class="kpi-head"><span class="kpi-label">Status Aman</span><span class="kpi-icon tone-emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span></div>
+          <div class="kpi-value" id="kpiOk">0</div>
+          <div class="kpi-hint">Masih jauh dari jatuh tempo</div>
+        </div>
+        <div class="kpi-card is-active" data-kpi-filter="all" tabindex="0" role="button" title="Klik untuk menampilkan semua jadwal PM">
+          <div class="kpi-head"><span class="kpi-label">Total Jadwal PM</span><span class="kpi-icon tone-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span></div>
+          <div class="kpi-value" id="kpiTotal">0</div>
+          <div class="kpi-hint" id="kpiTodayHint">Diurutkan dari Due Date terdekat</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>Daftar Jadwal Preventive Maintenance</h3>
+            <p class="panel-sub">Pantau due date setiap kombinasi Line · Machine · Part. Klik <b>✓ Selesai</b> untuk mencatat pengerjaan &amp; mereset siklus berikutnya.</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" class="btn btn-secondary btn-sm" id="syncDailyPmBtn" title="Tarik data Pergantian Part = YES dari Daily Report & reset due date otomatis">🔄 Sinkron Daily Report (Ganti Part: YES)</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="exportSchedulesBtn">Export Excel</button>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <input type="search" id="filterSearch" placeholder="Cari part, mesin, atau catatan…">
+          <select id="filterLine"><option value="">Semua Line</option></select>
+          <select id="filterMachine"><option value="">Semua Machine</option></select>
+          <select id="filterPart"><option value="">Semua Part</option></select>
+          <select id="filterStatus">
+            <option value="all">Semua Status</option>
+            <option value="overdue">Overdue (Telat)</option>
+            <option value="due_soon">Segera PM</option>
+            <option value="ok">Aman</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Line / Machine</th>
+                <th>Part</th>
+                <th>Interval</th>
+                <th>PM Terakhir</th>
+                <th>Due Date</th>
+                <th>Sisa &amp; Umur Pakai</th>
+                <th>Problem Daily</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleTbody">
+              <tr><td colspan="8" class="empty">Memuat jadwal Plan Maintenance…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 2: MASTER PART -->
+    <section class="section" id="page-parts">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>Tambah Part Kustom (Di Luar Daily Report)</h3>
+            <p class="panel-sub">Tambahkan part baru khusus Plan Maintenance beserta interval PM default-nya (mis. 150, 180, 365 hari).</p>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <input type="text" id="newCustomPartName" placeholder="Nama Part baru (contoh: SENSOR LASER, BEARING TURRET)" style="min-width:260px;flex:1">
+          <input type="number" id="newCustomPartInterval" min="1" value="180" style="width:120px" title="Interval default (hari)">
+          <button type="button" class="btn btn-primary" id="addCustomPartBtn">+ Simpan Part Baru</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>Part Kustom Tersimpan</h3>
+            <p class="panel-sub">Part tambahan yang Anda buat sendiri. Bisa dihapus kapan saja.</p>
+          </div>
+        </div>
+        <div id="customPartsList" class="parts-grid"><div class="empty">Belum ada part kustom.</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>Part Bawaan dari Daily Report</h3>
+            <p class="panel-sub">Otomatis tersedia di pilihan jadwal PM agar terhubung dengan catatan problem Daily Report.</p>
+          </div>
+        </div>
+        <div id="defaultPartsList" class="parts-grid"></div>
+      </div>
+    </section>
+
+    <!-- PAGE 3: RIWAYAT PM -->
+    <section class="section" id="page-logs">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>Riwayat Pelaksanaan PM</h3>
+            <p class="panel-sub">Catatan historis seluruh PM yang telah diselesaikan beserta teknisi, shift, dan siklus berikutnya.</p>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="exportLogsBtn">Export Excel Riwayat</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tgl Selesai</th>
+                <th>Line / Machine</th>
+                <th>Part</th>
+                <th>Shift</th>
+                <th>Teknisi / PIC</th>
+                <th>Due Date Berikutnya</th>
+                <th>Catatan</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="logsTbody">
+              <tr><td colspan="8" class="empty">Belum ada riwayat pelaksanaan PM.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- DIALOG TAMBAH / EDIT JADWAL PM -->
+<dialog id="scheduleDialog">
+  <div class="dlg-head">
+    <div><div class="eyebrow">JADWAL PM</div><h3 id="scheduleDlgTitle">Tambah Jadwal PM</h3></div>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="closeDlg('scheduleDialog')">Tutup</button>
+  </div>
+  <div class="dlg-body">
+    <input type="hidden" id="schedId">
+    <div class="form-grid">
+      <div class="field">
+        <label for="schedLine">Line</label>
+        <select id="schedLine"></select>
+      </div>
+      <div class="field">
+        <label for="schedMachine">Machine</label>
+        <select id="schedMachine"></select>
+      </div>
+      <div class="field full">
+        <label for="schedPart">Part (pilih dari daftar atau ketik baru)</label>
+        <input id="schedPart" list="allPartsDatalist" placeholder="Pilih atau ketik nama part (mis. FTA, OLG, CID4)">
+        <datalist id="allPartsDatalist"></datalist>
+      </div>
+      <div class="field">
+        <label for="schedInterval">Interval PM (Hari)</label>
+        <input type="number" id="schedInterval" min="1" value="180">
+        <div class="preset-row">
+          <button type="button" class="preset-btn" data-int-preset="90">90 hr</button>
+          <button type="button" class="preset-btn" data-int-preset="150">150 hr</button>
+          <button type="button" class="preset-btn" data-int-preset="180">180 hr</button>
+          <button type="button" class="preset-btn" data-int-preset="365">365 hr</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="schedLead">Peringatan Sebelum Due (Hari)</label>
+        <input type="number" id="schedLead" min="0" value="14">
+      </div>
+      <div class="field">
+        <label for="schedLastDate">Tanggal PM Terakhir</label>
+        <input type="date" id="schedLastDate">
+      </div>
+      <div class="field">
+        <label for="schedDueDate">Due Date (Otomatis / Bisa Edit Manual)</label>
+        <input type="date" id="schedDueDate">
+      </div>
+      <div class="field full">
+        <label for="schedNotes">Catatan / Checklist PM (Opsional)</label>
+        <textarea id="schedNotes" rows="2" placeholder="Contoh: Cek kalibrasi sensor, bersihkan lensa, ganti seal jika aus"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="dlg-foot">
+    <span id="schedStatus" class="status-msg"></span>
+    <button type="button" class="btn btn-secondary" onclick="closeDlg('scheduleDialog')">Batal</button>
+    <button type="button" class="btn btn-primary" id="saveSchedBtn">Simpan Jadwal</button>
+  </div>
+</dialog>
+
+<!-- DIALOG TAMBAH MASSAL -->
+<dialog id="bulkDialog">
+  <div class="dlg-head">
+    <div><div class="eyebrow">TAMBAH MASSAL</div><h3>Buat Jadwal PM untuk Banyak Mesin</h3></div>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="closeDlg('bulkDialog')">Tutup</button>
+  </div>
+  <div class="dlg-body">
+    <div class="form-grid" style="margin-bottom:12px">
+      <div class="field full">
+        <label for="bulkPart">Part</label>
+        <input id="bulkPart" list="allPartsDatalist" placeholder="Pilih atau ketik part (mis. FTA, CID4, OLG)">
+      </div>
+      <div class="field">
+        <label for="bulkInterval">Interval PM (Hari)</label>
+        <input type="number" id="bulkInterval" min="1" value="180">
+      </div>
+      <div class="field">
+        <label for="bulkLead">Peringatan H- (Hari)</label>
+        <input type="number" id="bulkLead" min="0" value="14">
+      </div>
+      <div class="field">
+        <label for="bulkLastDate">Tanggal PM Terakhir</label>
+        <input type="date" id="bulkLastDate">
+      </div>
+      <div class="field">
+        <label for="bulkDueDate">Due Date</label>
+        <input type="date" id="bulkDueDate">
+      </div>
+    </div>
+    <div class="field">
+      <label>Pilih Mesin Target (<span id="bulkSelectedCount">0</span> dipilih)</label>
+      <div class="preset-row" style="margin-bottom:6px">
+        <button type="button" class="preset-btn" id="bulkSelectAllFp">Pilih Semua FP</button>
+        <button type="button" class="preset-btn" id="bulkSelectAll">Pilih Semua</button>
+        <button type="button" class="preset-btn" id="bulkClearAll">Kosongkan</button>
+      </div>
+      <div id="bulkLinesContainer" class="bulk-lines"></div>
+    </div>
+  </div>
+  <div class="dlg-foot">
+    <span id="bulkStatus" class="status-msg"></span>
+    <button type="button" class="btn btn-secondary" onclick="closeDlg('bulkDialog')">Batal</button>
+    <button type="button" class="btn btn-primary" id="saveBulkBtn">Simpan Semua Jadwal</button>
+  </div>
+</dialog>
+
+<!-- DIALOG SELESAI PM -->
+<dialog id="completeDialog">
+  <div class="dlg-head">
+    <div><div class="eyebrow">REALISASI PM</div><h3 id="compTitle">Tandai PM Selesai</h3></div>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="closeDlg('completeDialog')">Tutup</button>
+  </div>
+  <div class="dlg-body">
+    <input type="hidden" id="compScheduleId">
+    <p id="compSub" class="panel-sub" style="margin:0 0 12px"></p>
+    <div class="form-grid">
+      <div class="field">
+        <label for="compDoneDate">Tanggal PM Selesai</label>
+        <input type="date" id="compDoneDate">
+      </div>
+      <div class="field">
+        <label for="compInterval">Interval Siklus Berikutnya (Hari)</label>
+        <input type="number" id="compInterval" min="1" value="180">
+      </div>
+      <div class="field">
+        <label for="compNextDue">Due Date Berikutnya (Bisa Edit)</label>
+        <input type="date" id="compNextDue">
+      </div>
+      <div class="field">
+        <label for="compShift">Shift</label>
+        <select id="compShift">
+          <option value="A">Shift A</option>
+          <option value="B">Shift B</option>
+          <option value="C">Shift C</option>
+          <option value="D">Shift D</option>
+          <option value="D/W">Shift D/W</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label for="compTech">Teknisi / PIC</label>
+        <input type="text" id="compTech" placeholder="Nama teknisi pelaksana PM">
+      </div>
+      <div class="field full">
+        <label for="compNotes">Catatan Hasil PM / Penggantian Part</label>
+        <textarea id="compNotes" rows="2" placeholder="Contoh: PM selesai, kondisi normal / ganti sensor baru"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="dlg-foot">
+    <span id="compStatus" class="status-msg"></span>
+    <button type="button" class="btn btn-secondary" onclick="closeDlg('completeDialog')">Batal</button>
+    <button type="button" class="btn btn-primary" id="confirmCompleteBtn">✓ Simpan &amp; Reset Siklus</button>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let BOOT = { todayWib: '', lines: {}, defaultParts: [], customParts: [], allParts: [], schedules: [], logs: [], counts: { total: 0, overdue: 0, dueSoon: 0, ok: 0, alertCount: 0 } };
+  let toastTimer = null;
+
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+  }
+  window.closeDlg = (id) => { const d = $(id); if (d && d.open) d.close(); };
+  window.switchParentTab = (tab) => {
+    if (window.parent && typeof window.parent.switchProjectTab === 'function') {
+      window.parent.switchProjectTab(tab);
+    } else if (tab === 'daily') {
+      window.location.href = '/daily-report.html';
+    } else if (tab === 'success') {
+      window.location.href = '/?page=success';
+    }
+  };
+
+  async function api(action, ...args) {
+    const res = await fetch('/api/gas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, args })
+    });
+    const data = await res.json().catch(() => ({ ok: false, error: 'Respon server tidak valid.' }));
+    if (!res.ok || !data.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    return data.result;
+  }
+
+  function addDaysIso(iso, days) {
+    const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return '';
+    const d = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])));
+    d.setUTCDate(d.getUTCDate() + Math.round(Number(days) || 0));
+    return d.toISOString().slice(0, 10);
+  }
+
+  function fmtDateId(iso) {
+    if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return '—';
+    return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(iso + 'T00:00:00Z'));
+  }
+
+  function syncParentBadge() {
+    const c = BOOT.counts || { alertCount: 0, overdue: 0, dueSoon: 0 };
+    const n = Number(c.alertCount || 0);
+    [$('pmTabBadge'), $('navAlertBadge')].forEach(el => {
+      if (!el) return;
+      el.hidden = n <= 0;
+      el.textContent = String(n);
+    });
+    try {
+      if (window.parent && typeof window.parent.updatePmBadgeCount === 'function') {
+        window.parent.updatePmBadgeCount(c);
+      }
+    } catch (_e) {}
+  }
+
+  function renderAll() {
+    const c = BOOT.counts || { total: 0, overdue: 0, dueSoon: 0, ok: 0, alertCount: 0 };
+    $('kpiOverdue').textContent = String(c.overdue || 0);
+    $('kpiDueSoon').textContent = String(c.dueSoon || 0);
+    $('kpiOk').textContent = String(c.ok || 0);
+    $('kpiTotal').textContent = String(c.total || 0);
+    $('kpiTodayHint').textContent = 'Hari ini: ' + fmtDateId(BOOT.todayWib);
+    syncParentBadge();
+    renderAlertBanner();
+    populateFilters();
+    renderSchedulesTable();
+    renderMasterParts();
+    renderLogsTable();
+  }
+
+  function renderAlertBanner() {
+    const banner = $('pmAlertBanner');
+    const urgent = (BOOT.schedules || []).filter(s => s.status === 'overdue' || s.status === 'due_soon');
+    if (!urgent.length) { banner.hidden = true; banner.innerHTML = ''; return; }
+    const ov = urgent.filter(s => s.status === 'overdue').length;
+    const soon = urgent.filter(s => s.status === 'due_soon').length;
+    banner.hidden = false;
+    banner.classList.toggle('is-warn', ov === 0);
+    const summaryParts = [];
+    if (ov) summaryParts.push(ov + ' part lewat jatuh tempo');
+    if (soon) summaryParts.push(soon + ' part segera PM');
+    const pills = urgent.slice(0, 6).map(s => {
+      const lbl = s.daysRemaining < 0 ? ('Telat ' + Math.abs(s.daysRemaining) + ' hr') : (s.daysRemaining === 0 ? 'Hari ini' : ('H-' + s.daysRemaining));
+      return `<button type="button" class="alert-pill ${s.status === 'due_soon' ? 'is-soon' : ''}" data-quick-done="${esc(s.id)}" title="Klik untuk menandai PM selesai">L${esc(s.line)} · ${esc(s.machine)} · ${esc(s.part)} (${lbl})</button>`;
+    }).join('');
+    banner.innerHTML = `<span class="alert-badge">🔔 Peringatan PM</span><span><b>${summaryParts.join(' · ')}</b> — klik item untuk catat selesai:</span>${pills}`;
+  }
+
+  function populateFilters() {
+    const curL = $('filterLine').value, curM = $('filterMachine').value, curP = $('filterPart').value;
+    const lines = Object.keys(BOOT.lines || {});
+    $('filterLine').innerHTML = '<option value="">Semua Line</option>' + lines.map(l => `<option value="${esc(l)}">Line ${esc(l)}</option>`).join('');
+    if (lines.includes(curL)) $('filterLine').value = curL;
+
+    const machSet = new Set();
+    if ($('filterLine').value && BOOT.lines[$('filterLine').value]) {
+      BOOT.lines[$('filterLine').value].forEach(m => machSet.add(m));
+    } else {
+      Object.values(BOOT.lines || {}).forEach(arr => arr.forEach(m => machSet.add(m)));
+    }
+    (BOOT.schedules || []).forEach(s => { if (!$('filterLine').value || s.line === $('filterLine').value) machSet.add(s.machine); });
+    const machs = [...machSet];
+    $('filterMachine').innerHTML = '<option value="">Semua Machine</option>' + machs.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
+    if (machs.includes(curM)) $('filterMachine').value = curM;
+
+    const parts = [...new Set([...(BOOT.allParts || []), ...(BOOT.schedules || []).map(s => s.part)])].sort((a, b) => a.localeCompare(b));
+    $('filterPart').innerHTML = '<option value="">Semua Part</option>' + parts.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
+    if (parts.includes(curP)) $('filterPart').value = curP;
+
+    $('allPartsDatalist').innerHTML = parts.map(p => `<option value="${esc(p)}">`).join('');
+  }
+
+  function getFilteredSchedules() {
+    const q = $('filterSearch').value.trim().toLowerCase();
+    const fl = $('filterLine').value, fm = $('filterMachine').value, fp = $('filterPart').value, fs = $('filterStatus').value;
+    return (BOOT.schedules || []).filter(s => {
+      if (fl && s.line !== fl) return false;
+      if (fm && s.machine !== fm) return false;
+      if (fp && s.part !== fp) return false;
+      if (fs !== 'all' && s.status !== fs) return false;
+      if (q) {
+        const hay = (`line ${s.line} ${s.machine} ${s.part} ${s.notes}`).toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderSchedulesTable() {
+    const list = getFilteredSchedules();
+    const tbody = $('scheduleTbody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty">Belum ada jadwal PM yang sesuai filter. Klik <b>+ Tambah Jadwal PM</b> atau <b>+ Tambah Massal</b> untuk mulai.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(s => {
+      const remLabel = s.daysRemaining < 0
+        ? `Telat ${Math.abs(s.daysRemaining)} hari`
+        : (s.daysRemaining === 0 ? 'Jatuh Tempo Hari Ini' : `H-${s.daysRemaining} hari`);
+      const fillW = Math.min(100, Math.max(4, s.progressPct));
+      const probBadge = s.problemsSincePm > 0
+        ? `<span class="corr-badge" title="Tercatat ${s.problemsSincePm}× problem di Daily Report sejak PM terakhir (${fmtDateId(s.lastPmDate)})">⚠ ${s.problemsSincePm}× problem</span>`
+        : `<span class="corr-badge zero">0 problem</span>`;
+      return `<tr class="${s.status === 'overdue' ? 'row-overdue' : ''}">
+        <td><b>Line ${esc(s.line)}</b> · ${esc(s.machine)}</td>
+        <td><b>${esc(s.part)}</b>${s.notes ? `<div style="font-size:11px;color:#647b85">${esc(s.notes)}</div>` : ''}</td>
+        <td style="white-space:nowrap">${s.intervalDays} hr <small style="color:#647b85">(H-${s.leadDays})</small></td>
+        <td style="white-space:nowrap">${fmtDateId(s.lastPmDate)}</td>
+        <td style="white-space:nowrap;font-weight:750">${fmtDateId(s.dueDate)}</td>
+        <td class="prog-wrap">
+          <div class="prog-meta">
+            <span class="status-pill ${s.status}">${remLabel}</span>
+            <span style="color:#647b85;font-weight:700">${s.progressPct}%</span>
+          </div>
+          <div class="prog-track"><div class="prog-fill ${s.status}" style="width:${fillW}%"></div></div>
+        </td>
+        <td>${probBadge}</td>
+        <td>
+          <div class="row-actions">
+            <button type="button" class="btn btn-done btn-sm" data-action="done" data-id="${esc(s.id)}">✓ Selesai</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-action="edit" data-id="${esc(s.id)}">Edit</button>
+            <button type="button" class="btn btn-danger btn-sm" data-action="del" data-id="${esc(s.id)}">Hapus</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderMasterParts() {
+    const custom = BOOT.customParts || [];
+    $('customPartsList').innerHTML = custom.length ? custom.map(p => `
+      <div class="part-card">
+        <div>
+          <strong>${esc(p.partName)}</strong>
+          <small>Default interval: ${p.defaultIntervalDays} hari</small>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="part-tag custom">Kustom</span>
+          <button type="button" class="btn btn-danger btn-sm" data-del-part="${esc(p.partName)}">Hapus</button>
+        </div>
+      </div>`).join('') : '<div class="empty" style="grid-column:1/-1">Belum ada part kustom. Tambahkan part baru di kotak atas.</div>';
+
+    const def = BOOT.defaultParts || [];
+    $('defaultPartsList').innerHTML = def.map(p => `
+      <div class="part-card">
+        <div><strong>${esc(p)}</strong><small>Master Daily Report</small></div>
+        <span class="part-tag">Default</span>
+      </div>`).join('');
+  }
+
+  function renderLogsTable() {
+    const logs = BOOT.logs || [];
+    $('logsTbody').innerHTML = logs.length ? logs.map(l => `
+      <tr>
+        <td style="white-space:nowrap;font-weight:750">${fmtDateId(l.doneDate)}</td>
+        <td><b>Line ${esc(l.line)}</b> · ${esc(l.machine)}</td>
+        <td><b>${esc(l.part)}</b></td>
+        <td>${esc(l.shift || '—')}</td>
+        <td>${esc(l.technician || '—')}</td>
+        <td style="white-space:nowrap">${fmtDateId(l.nextDueDate)}</td>
+        <td>${esc(l.notes || '—')}</td>
+        <td><button type="button" class="btn btn-danger btn-sm" data-del-log="${esc(l.id)}">Hapus</button></td>
+      </tr>`).join('') : '<tr><td colspan="8" class="empty">Belum ada riwayat pelaksanaan PM.</td></tr>';
+  }
+
+  function fillMachineSelect(lineSel, machSel, selectedMach) {
+    const line = lineSel.value;
+    const list = (BOOT.lines && BOOT.lines[line]) ? [...BOOT.lines[line]] : [];
+    if (selectedMach && !list.includes(selectedMach)) list.push(selectedMach);
+    machSel.innerHTML = list.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
+    if (selectedMach) machSel.value = selectedMach;
+  }
+
+  function openScheduleModal(item) {
+    const lines = Object.keys(BOOT.lines || {});
+    $('schedLine').innerHTML = lines.map(l => `<option value="${esc(l)}">Line ${esc(l)}</option>`).join('');
+    $('schedStatus').textContent = '';
+    $('schedStatus').className = 'status-msg';
+
+    if (item) {
+      $('scheduleDlgTitle').textContent = 'Edit Jadwal PM · Line ' + item.line + ' ' + item.machine;
+      $('schedId').value = item.id;
+      $('schedLine').value = item.line;
+      fillMachineSelect($('schedLine'), $('schedMachine'), item.machine);
+      $('schedPart').value = item.part;
+      $('schedInterval').value = item.intervalDays;
+      $('schedLead').value = item.leadDays;
+      $('schedLastDate').value = item.lastPmDate;
+      $('schedDueDate').value = item.dueDate;
+      $('schedNotes').value = item.notes || '';
+    } else {
+      $('scheduleDlgTitle').textContent = 'Tambah Jadwal PM Baru';
+      $('schedId').value = '';
+      $('schedLine').value = lines[0] || '11';
+      fillMachineSelect($('schedLine'), $('schedMachine'), '');
+      $('schedPart').value = '';
+      $('schedInterval').value = '180';
+      $('schedLead').value = '14';
+      $('schedLastDate').value = BOOT.todayWib;
+      $('schedDueDate').value = addDaysIso(BOOT.todayWib, 180);
+      $('schedNotes').value = '';
+    }
+    $('scheduleDialog').showModal();
+  }
+
+  function openBulkModal() {
+    $('bulkPart').value = '';
+    $('bulkInterval').value = '180';
+    $('bulkLead').value = '14';
+    $('bulkLastDate').value = BOOT.todayWib;
+    $('bulkDueDate').value = addDaysIso(BOOT.todayWib, 180);
+    $('bulkStatus').textContent = '';
+    $('bulkStatus').className = 'status-msg';
+
+    const container = $('bulkLinesContainer');
+    container.innerHTML = Object.entries(BOOT.lines || {}).map(([line, machs]) => `
+      <div class="bulk-line-box">
+        <div class="bulk-line-head">
+          <span>Line ${esc(line)}</span>
+          <button type="button" class="preset-btn" data-toggle-line="${esc(line)}">Pilih Line ${esc(line)}</button>
+        </div>
+        <div class="bulk-machines">
+          ${machs.map(m => `<label class="bulk-chip"><input type="checkbox" data-bulk-line="${esc(line)}" data-bulk-mach="${esc(m)}"><span>${esc(m)}</span></label>`).join('')}
+        </div>
+      </div>`).join('');
+    updateBulkCount();
+    $('bulkDialog').showModal();
+  }
+
+  function updateBulkCount() {
+    const n = $('bulkLinesContainer').querySelectorAll('input[type="checkbox"]:checked').length;
+    $('bulkSelectedCount').textContent = String(n);
+  }
+
+  function openCompleteModal(item) {
+    if (!item) return;
+    $('compScheduleId').value = item.id;
+    $('compTitle').textContent = `Selesai PM · L${item.line} ${item.machine} (${item.part})`;
+    $('compSub').textContent = `PM sebelumnya: ${fmtDateId(item.lastPmDate)} · Due Date saat ini: ${fmtDateId(item.dueDate)}`;
+    $('compDoneDate').value = BOOT.todayWib;
+    $('compInterval').value = item.intervalDays;
+    $('compNextDue').value = addDaysIso(BOOT.todayWib, item.intervalDays);
+    $('compTech').value = '';
+    $('compNotes').value = '';
+    $('compStatus').textContent = '';
+    $('compStatus').className = 'status-msg';
+    $('completeDialog').showModal();
+  }
+
+  async function refreshBootstrap() {
+    try {
+      BOOT = await api('getPmBootstrapData');
+      renderAll();
+    } catch (err) {
+      $('scheduleTbody').innerHTML = `<tr><td colspan="8" class="empty" style="color:#be123c">Gagal memuat data PM: ${esc(err.message || err)}</td></tr>`;
+    }
+  }
+
+  // Auto-calc Due Date when Last Date or Interval changes
+  ['schedLastDate', 'schedInterval'].forEach(id => $(id).addEventListener('input', () => {
+    const d = addDaysIso($('schedLastDate').value, $('schedInterval').value);
+    if (d) $('schedDueDate').value = d;
+  }));
+  ['bulkLastDate', 'bulkInterval'].forEach(id => $(id).addEventListener('input', () => {
+    const d = addDaysIso($('bulkLastDate').value, $('bulkInterval').value);
+    if (d) $('bulkDueDate').value = d;
+  }));
+  ['compDoneDate', 'compInterval'].forEach(id => $(id).addEventListener('input', () => {
+    const d = addDaysIso($('compDoneDate').value, $('compInterval').value);
+    if (d) $('compNextDue').value = d;
+  }));
+
+  // Auto-fill default interval if user picks a custom part
+  $('schedPart').addEventListener('change', () => {
+    const val = $('schedPart').value.trim().toUpperCase();
+    const cp = (BOOT.customParts || []).find(p => p.partName.toUpperCase() === val);
+    if (cp) {
+      $('schedInterval').value = cp.defaultIntervalDays;
+      const d = addDaysIso($('schedLastDate').value, cp.defaultIntervalDays);
+      if (d) $('schedDueDate').value = d;
+    }
+  });
+
+  $('schedLine').addEventListener('change', () => fillMachineSelect($('schedLine'), $('schedMachine'), ''));
+  document.querySelectorAll('[data-int-preset]').forEach(btn => btn.addEventListener('click', () => {
+    $('schedInterval').value = btn.dataset.intPreset;
+    const d = addDaysIso($('schedLastDate').value, btn.dataset.intPreset);
+    if (d) $('schedDueDate').value = d;
+  }));
+
+  // Navigation
+  document.querySelectorAll('.nav button').forEach(btn => btn.addEventListener('click', () => {
+    const target = btn.dataset.page;
+    document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === 'page-' + target));
+    $('pageTitle').textContent = { schedules: 'Jadwal Plan Maintenance', parts: 'Master Part PM', logs: 'Riwayat Pelaksanaan PM' }[target] || 'Plan Maintenance';
+  }));
+
+  // KPI Card Filters
+  document.querySelectorAll('[data-kpi-filter]').forEach(card => card.addEventListener('click', () => {
+    const st = card.dataset.kpiFilter;
+    $('filterStatus').value = st;
+    document.querySelectorAll('[data-kpi-filter]').forEach(c => c.classList.toggle('is-active', c === card));
+    renderSchedulesTable();
+  }));
+
+  // Filter events
+  ['filterSearch', 'filterLine', 'filterMachine', 'filterPart', 'filterStatus'].forEach(id => {
+    $(id).addEventListener(id === 'filterSearch' ? 'input' : 'change', () => {
+      if (id === 'filterLine') populateFilters();
+      if (id === 'filterStatus') {
+        document.querySelectorAll('[data-kpi-filter]').forEach(c => c.classList.toggle('is-active', c.dataset.kpiFilter === $('filterStatus').value));
+      }
+      renderSchedulesTable();
+    });
+  });
+
+  // Buttons
+  $('openAddBtn').addEventListener('click', () => openScheduleModal(null));
+  $('openBulkBtn').addEventListener('click', openBulkModal);
+
+  $('saveSchedBtn').addEventListener('click', async () => {
+    const part = $('schedPart').value.trim();
+    const payload = {
+      id: $('schedId').value || undefined,
+      line: $('schedLine').value,
+      machine: $('schedMachine').value,
+      part,
+      intervalDays: Number($('schedInterval').value) || 180,
+      leadDays: Number($('schedLead').value) || 14,
+      lastPmDate: $('schedLastDate').value,
+      dueDate: $('schedDueDate').value,
+      notes: $('schedNotes').value.trim()
+    };
+    if (!payload.line || !payload.machine || !payload.part) {
+      $('schedStatus').textContent = 'Line, Machine, dan Part wajib diisi.';
+      $('schedStatus').className = 'status-msg err';
+      return;
+    }
+    $('saveSchedBtn').disabled = true;
+    $('schedStatus').textContent = 'Menyimpan…';
+    try {
+      // If part is new (not in defaultParts/customParts), automatically register it in pm_custom_parts
+      if (!BOOT.allParts.some(p => p.toUpperCase() === part.toUpperCase())) {
+        await api('addPmCustomPart', part, payload.intervalDays);
+      }
+      await api('savePmSchedule', payload);
+      closeDlg('scheduleDialog');
+      showToast('Jadwal PM berhasil disimpan.');
+      await refreshBootstrap();
+    } catch (err) {
+      $('schedStatus').textContent = err.message || String(err);
+      $('schedStatus').className = 'status-msg err';
+    } finally {
+      $('saveSchedBtn').disabled = false;
+    }
+  });
+
+  $('bulkLinesContainer').addEventListener('change', updateBulkCount);
+  $('bulkLinesContainer').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-toggle-line]');
+    if (!btn) return;
+    const boxes = [...$('bulkLinesContainer').querySelectorAll(`input[data-bulk-line="${btn.dataset.toggleLine}"]`)];
+    const allChecked = boxes.every(b => b.checked);
+    boxes.forEach(b => b.checked = !allChecked);
+    updateBulkCount();
+  });
+  $('bulkSelectAllFp').addEventListener('click', () => {
+    $('bulkLinesContainer').querySelectorAll('input[type="checkbox"]').forEach(b => b.checked = /^FP/i.test(b.dataset.bulkMach));
+    updateBulkCount();
+  });
+  $('bulkSelectAll').addEventListener('click', () => {
+    $('bulkLinesContainer').querySelectorAll('input[type="checkbox"]').forEach(b => b.checked = true);
+    updateBulkCount();
+  });
+  $('bulkClearAll').addEventListener('click', () => {
+    $('bulkLinesContainer').querySelectorAll('input[type="checkbox"]').forEach(b => b.checked = false);
+    updateBulkCount();
+  });
+
+  $('saveBulkBtn').addEventListener('click', async () => {
+    const part = $('bulkPart').value.trim();
+    const checked = [...$('bulkLinesContainer').querySelectorAll('input[type="checkbox"]:checked')];
+    if (!part) { $('bulkStatus').textContent = 'Nama Part wajib diisi.'; $('bulkStatus').className = 'status-msg err'; return; }
+    if (!checked.length) { $('bulkStatus').textContent = 'Pilih minimal 1 mesin target.'; $('bulkStatus').className = 'status-msg err'; return; }
+    const intervalDays = Number($('bulkInterval').value) || 180;
+    const leadDays = Number($('bulkLead').value) || 14;
+    const lastPmDate = $('bulkLastDate').value;
+    const dueDate = $('bulkDueDate').value;
+    const items = checked.map(b => ({ line: b.dataset.bulkLine, machine: b.dataset.bulkMach, part, intervalDays, leadDays, lastPmDate, dueDate, notes: '' }));
+    $('saveBulkBtn').disabled = true;
+    $('bulkStatus').textContent = `Menyimpan ${items.length} jadwal…`;
+    try {
+      if (!BOOT.allParts.some(p => p.toUpperCase() === part.toUpperCase())) {
+        await api('addPmCustomPart', part, intervalDays);
+      }
+      await api('savePmSchedule', { items });
+      closeDlg('bulkDialog');
+      showToast(`${items.length} jadwal PM berhasil ditambahkan.`);
+      await refreshBootstrap();
+    } catch (err) {
+      $('bulkStatus').textContent = err.message || String(err);
+      $('bulkStatus').className = 'status-msg err';
+    } finally {
+      $('saveBulkBtn').disabled = false;
+    }
+  });
+
+  $('confirmCompleteBtn').addEventListener('click', async () => {
+    const payload = {
+      scheduleId: $('compScheduleId').value,
+      doneDate: $('compDoneDate').value,
+      intervalDays: Number($('compInterval').value) || 180,
+      nextDueDate: $('compNextDue').value,
+      shift: $('compShift').value,
+      technician: $('compTech').value.trim(),
+      notes: $('compNotes').value.trim()
+    };
+    $('confirmCompleteBtn').disabled = true;
+    $('compStatus').textContent = 'Menyimpan realisasi…';
+    try {
+      await api('completePmSchedule', payload);
+      closeDlg('completeDialog');
+      showToast('PM tercatat selesai & siklus berikutnya diperbarui.');
+      await refreshBootstrap();
+    } catch (err) {
+      $('compStatus').textContent = err.message || String(err);
+      $('compStatus').className = 'status-msg err';
+    } finally {
+      $('confirmCompleteBtn').disabled = false;
+    }
+  });
+
+  // Table & Banner delegation
+  document.addEventListener('click', async (e) => {
+    const quickDone = e.target.closest('[data-quick-done]');
+    if (quickDone) {
+      const item = (BOOT.schedules || []).find(s => s.id === quickDone.dataset.quickDone);
+      if (item) openCompleteModal(item);
+      return;
+    }
+    const actBtn = e.target.closest('[data-action]');
+    if (actBtn) {
+      const item = (BOOT.schedules || []).find(s => s.id === actBtn.dataset.id);
+      if (!item) return;
+      if (actBtn.dataset.action === 'done') openCompleteModal(item);
+      else if (actBtn.dataset.action === 'edit') openScheduleModal(item);
+      else if (actBtn.dataset.action === 'del') {
+        if (!confirm(`Hapus jadwal PM untuk Line ${item.line} · ${item.machine} · ${item.part}?`)) return;
+        try {
+          await api('deletePmSchedule', item.id);
+          showToast('Jadwal PM dihapus.');
+          await refreshBootstrap();
+        } catch (err) { showToast('Gagal menghapus: ' + (err.message || err)); }
+      }
+      return;
+    }
+    const delPart = e.target.closest('[data-del-part]');
+    if (delPart) {
+      const name = delPart.dataset.delPart;
+      if (!confirm(`Hapus part kustom "${name}" dari daftar pilihan?`)) return;
+      try {
+        await api('deletePmCustomPart', name);
+        showToast('Part kustom dihapus.');
+        await refreshBootstrap();
+      } catch (err) { showToast('Gagal menghapus part: ' + (err.message || err)); }
+      return;
+    }
+    const delLog = e.target.closest('[data-del-log]');
+    if (delLog) {
+      if (!confirm('Hapus catatan riwayat PM ini?')) return;
+      try {
+        await api('deletePmLog', delLog.dataset.delLog);
+        showToast('Riwayat PM dihapus.');
+        await refreshBootstrap();
+      } catch (err) { showToast('Gagal menghapus riwayat: ' + (err.message || err)); }
+    }
+  });
+
+  $('addCustomPartBtn').addEventListener('click', async () => {
+    const name = $('newCustomPartName').value.trim();
+    const interval = Number($('newCustomPartInterval').value) || 180;
+    if (!name) { showToast('Masukkan nama part terlebih dahulu.'); return; }
+    $('addCustomPartBtn').disabled = true;
+    try {
+      await api('addPmCustomPart', name, interval);
+      $('newCustomPartName').value = '';
+      showToast(`Part "${name.toUpperCase()}" berhasil ditambahkan.`);
+      await refreshBootstrap();
+    } catch (err) {
+      showToast('Gagal menyimpan part: ' + (err.message || err));
+    } finally {
+      $('addCustomPartBtn').disabled = false;
+    }
+  });
+
+  // Export Excel helpers
+  async function exportTableExcel(sheetName, fileName, headers, rows) {
+    if (typeof ExcelJS === 'undefined') { showToast('Library ExcelJS belum dimuat.'); return; }
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet(sheetName);
+    const hdr = ws.addRow(headers);
+    hdr.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    hdr.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F766E' } };
+    rows.forEach(r => ws.addRow(r));
+    ws.columns.forEach(col => { col.width = 18; });
+    const buf = await wb.xlsx.writeBuffer();
+    const url = URL.createObjectURL(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    const a = document.createElement('a'); a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    showToast('File Excel ' + fileName + ' berhasil diunduh.');
+  }
+
+  $('exportSchedulesBtn').addEventListener('click', () => {
+    const list = getFilteredSchedules();
+    exportTableExcel('Jadwal PM', `Jadwal_PM_${BOOT.todayWib || 'export'}.xlsx`,
+      ['Line', 'Machine', 'Part', 'Interval (Hari)', 'PM Terakhir', 'Due Date', 'Sisa Hari', 'Status', 'Problem Daily Sejak PM', 'Catatan'],
+      list.map(s => ['Line ' + s.line, s.machine, s.part, s.intervalDays, s.lastPmDate, s.dueDate, s.daysRemaining, s.status === 'overdue' ? 'OVERDUE' : (s.status === 'due_soon' ? 'SEGERA PM' : 'AMAN'), s.problemsSincePm, s.notes])
+    );
+  });
+
+  $('exportLogsBtn').addEventListener('click', () => {
+    const logs = BOOT.logs || [];
+    exportTableExcel('Riwayat PM', `Riwayat_PM_${BOOT.todayWib || 'export'}.xlsx`,
+      ['Tanggal Selesai', 'Line', 'Machine', 'Part', 'Shift', 'Teknisi', 'Due Date Berikutnya', 'Catatan'],
+      logs.map(l => [l.doneDate, 'Line ' + l.line, l.machine, l.part, l.shift, l.technician, l.nextDueDate, l.notes])
+    );
+  });
+
+  $('syncDailyPmBtn').addEventListener('click', async () => {
+    const btn = $('syncDailyPmBtn');
+    btn.disabled = true;
+    btn.textContent = 'Menyinkronkan…';
+    try {
+      const res = await api('syncPmFromDailyHistory');
+      showToast(`Sinkron selesai: ${res.created || 0} jadwal baru, ${res.updated || 0} due date direset.`);
+      await refreshBootstrap();
+    } catch (err) {
+      showToast('Gagal sinkron: ' + (err.message || err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🔄 Sinkron Daily Report (Ganti Part: YES)';
+    }
+  });
+
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'REFRESH_PM') refreshBootstrap();
+  });
+
+  refreshBootstrap();
+})();
+</script>
+</body>
+</html>
