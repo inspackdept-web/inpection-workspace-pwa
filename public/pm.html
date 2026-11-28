@@ -446,7 +446,6 @@
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <select id="matrixLineFilter" style="padding:6px 10px;border:1px solid #cfe0dd;border-radius:8px;font-size:12px">
               <option value="all">Semua Line (11–24)</option>
-              <option value="fp">Hanya Mesin FP &amp; MCAL/MULTI</option>
               <option value="11">Line 11</option>
               <option value="12">Line 12</option>
               <option value="14">Line 14</option>
@@ -903,13 +902,14 @@
     const baseLineOrder = ['11', '12', '14', '21', '22', '24'];
     const lineCols = [];
     baseLineOrder.forEach(ln => {
-      if (mode !== 'all' && mode !== 'fp' && mode !== ln) return;
-      let machs = (BOOT.lines && BOOT.lines[ln]) ? [...BOOT.lines[ln]] : [];
-      if (mode === 'fp') machs = machs.filter(m => !/^ICK/i.test(m));
+      if (mode !== 'all' && mode !== ln) return;
+      // Kolom matriks cukup FP1..FP6, MCAL4, MULTI4 (ICK1..ICK6 masuk ke baris ICK pada kolom FP1..FP6)
+      let machs = (BOOT.lines && BOOT.lines[ln]) ? BOOT.lines[ln].filter(m => !/^ICK/i.test(m)) : [];
       if (machs.length) lineCols.push({ line: ln, machines: machs });
     });
 
-    const parts = (BOOT.allParts || []).filter(p => !q || p.toLowerCase().includes(q));
+    const partsRaw = (BOOT.allParts || []).map(p => /^ICK\s*[1-6]$/i.test(String(p).trim()) ? 'ICK' : String(p).trim());
+    const parts = [...new Set(partsRaw)].filter(p => !q || p.toLowerCase().includes(q));
     if (!parts.length || !lineCols.length) {
       wrap.innerHTML = '<div class="empty">Belum ada part atau mesin untuk ditampilkan pada matriks.</div>';
       return;
@@ -917,7 +917,13 @@
 
     const schedMap = {};
     (BOOT.schedules || []).forEach(s => {
-      const k = `${String(s.part).trim().toUpperCase()}|${String(s.line).trim().toUpperCase()}|${String(s.machine).trim().toUpperCase()}`;
+      let pKey = String(s.part || '').trim().toUpperCase();
+      let mKey = String(s.machine || '').trim().toUpperCase();
+      const pIck = pKey.match(/^ICK\s*([1-6])$/i);
+      const mIck = mKey.match(/^ICK\s*([1-6])$/i);
+      if (pIck) { pKey = 'ICK'; if (!mKey || mIck) mKey = 'FP' + pIck[1]; }
+      else if (mIck) { mKey = 'FP' + mIck[1]; }
+      const k = `${pKey}|${String(s.line).trim().toUpperCase()}|${mKey}`;
       if (!schedMap[k] || s.dueDate < schedMap[k].dueDate) schedMap[k] = s;
     });
 

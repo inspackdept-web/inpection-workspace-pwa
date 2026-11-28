@@ -1126,7 +1126,7 @@
     const STATE = { page:'dashboard', inputUploads:{}, historyUploads:{}, uploadDate:null, manualMode:false, autoSamplingMode:false, toastTimer:null, dashboardData:null, dashboardComments:{daily:[],line:[]}, activeCommentDate:null, activeCommentChart:'daily', activeCommentLine:'', dashboardRequestId:0, calendarRequestId:{input:0,history:0}, downloadObjectUrl:null, analysisChartMode:'shift', activeProjectTab:'daily' };
     const $ = (id) => document.getElementById(id);
 
-    const DAILY_SRCDOC_B64 = ''; const PWA_DAILY_URL = '/daily-report.html?v=12'; const PWA_PM_URL = '/pm.html?v=3';
+    const DAILY_SRCDOC_B64 = ''; const PWA_DAILY_URL = '/daily-report.html?v=12'; const PWA_PM_URL = '/pm.html?v=4';
 
     const SR_HERO_PALETTES = {
       green: ['#15803d', '#4ade80', '#166534', '#052e16'],
@@ -1252,6 +1252,13 @@
         if (!_pmFrameLoaded && $('pmWorkspaceFrame')) {
           $('pmWorkspaceFrame').src = PWA_PM_URL;
           _pmFrameLoaded = true;
+        } else {
+          try {
+            const pf = $('pmWorkspaceFrame');
+            if (pf && pf.contentWindow && typeof pf.contentWindow.page === 'function') {
+              pf.contentWindow.page('dashboard');
+            }
+          } catch (_e) {}
         }
         document.title = 'Plan Maintenance (PM) | PT KCI';
       } else if (isDaily) {
