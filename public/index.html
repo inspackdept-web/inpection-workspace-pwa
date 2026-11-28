@@ -71,11 +71,14 @@
     .hero-bottle:nth-child(2) { width:40px; height:98px; }
     .hero-bottle:nth-child(2)::before { left:10px; }
     .kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:13px; margin-bottom:16px; }
-    .kpi { position:relative; display:flex; flex-direction:column; justify-content:space-between; min-height:148px; padding:16px 18px 12px; border:1px solid var(--line); border-radius:14px; background:var(--white); box-shadow:0 3px 14px rgba(16,42,55,.05); text-align:left; overflow:hidden; transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; }
-    .kpi:hover { transform:translateY(-2px); box-shadow:0 10px 24px rgba(16,42,55,.09); border-color:#bfd7d3; }
+    .kpi { position:relative; display:flex; flex-direction:column; justify-content:space-between; min-height:148px; padding:16px 18px 12px; border:1px solid var(--line); border-radius:14px; background:var(--white); box-shadow:0 3px 14px rgba(16,42,55,.05); text-align:left; overflow:hidden; cursor:pointer; transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s ease,border-color .22s ease,background .22s ease; }
+    .kpi:hover { transform:translateY(-4px); box-shadow:0 14px 28px rgba(16,42,55,.11); border-color:#7bc6b3; background:#fcfffe; }
+    .kpi:active { transform:translateY(-1px); }
+    .kpi:hover .kpi-icon { transform:scale(1.1) rotate(-4deg); }
+    .kpi:hover .kpi-spark svg { filter:saturate(1.2) drop-shadow(0 2px 4px rgba(15,118,110,.16)); }
     .kpi-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
     .kpi-label { color:#5b7480; font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; line-height:1.25; }
-    .kpi-icon { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; flex:none; }
+    .kpi-icon { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; flex:none; transition:transform .22s cubic-bezier(.2,.8,.2,1); }
     .kpi-icon svg { width:18px; height:18px; stroke-width:2.1; }
     .kpi-icon.tone-emerald { background:#ecfdf5; color:#059669; }
     .kpi-icon.tone-rose { background:#fff1f2; color:#e11d48; }
@@ -90,8 +93,10 @@
     .sev-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:10px; }
     @media(max-width:960px){ .sev-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
     @media(max-width:600px){ .sev-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-    .sev-card { padding:11px 12px; border-radius:11px; border:1px solid var(--line); background:#f8fbfa; display:flex; flex-direction:column; gap:6px; }
+    .sev-card { width:100%; padding:11px 12px; border-radius:11px; border:1px solid var(--line); background:#f8fbfa; display:flex; flex-direction:column; gap:6px; text-align:left; cursor:pointer; transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s ease,border-color .2s ease,background .2s ease; }
+    .sev-card:hover { transform:translateY(-3px); box-shadow:0 10px 20px rgba(16,42,55,.1); border-color:#7bc6b3; }
     .sev-card.has-crit { border-color:#fecdd3; background:#fff7f8; }
+    .sev-card.has-crit:hover { border-color:#f43f5e; background:#fff1f2; }
     .sev-card-head { display:flex; justify-content:space-between; align-items:center; font-size:11.5px; font-weight:800; color:#1e3a46; }
     .sev-crit-tag { padding:1px 6px; border-radius:999px; font-size:10px; font-weight:800; background:#ffe4e6; color:#be123c; }
     .sev-crit-tag.ok { background:#ecfdf5; color:#047857; }
@@ -814,22 +819,22 @@
           </svg>
         </section>
         <section class="kpis" aria-label="Ringkasan bulan">
-          <div class="kpi">
+          <div class="kpi" data-sr-kpi="rate" tabindex="0" role="button" title="Klik untuk melihat detail Success Rate hari ini">
             <div class="kpi-head"><div class="kpi-label">Total Success Rate</div><div class="kpi-icon tone-emerald" id="kpiRateIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div>
             <div class="kpi-body"><div class="kpi-value" id="kpiRate">0%</div><div class="kpi-hint" id="kpiRateHint">Success Rate all machine</div></div>
             <div class="kpi-spark" id="sparkSrRate"></div>
           </div>
-          <div class="kpi">
+          <div class="kpi" data-sr-kpi="samples" tabindex="0" role="button" title="Klik untuk melihat rincian sampel harian">
             <div class="kpi-head"><div class="kpi-label">Total Sampel</div><div class="kpi-icon tone-teal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6l-5 8.5A2 2 0 0 0 6.7 21h10.6a2 2 0 0 0 1.7-3.5L14 9V3"/><path d="M8.5 14h7"/></svg></div></div>
             <div class="kpi-body"><div class="kpi-value" id="kpiSamples">0</div><div class="kpi-hint" id="kpiSamplesHint">Total sampel pada tanggal terpilih</div></div>
             <div class="kpi-spark" id="sparkSrSamples"></div>
           </div>
-          <div class="kpi">
+          <div class="kpi" data-sr-kpi="failures" tabindex="0" role="button" title="Klik untuk melihat rincian sampel gagal">
             <div class="kpi-head"><div class="kpi-label">Total Sampel Gagal</div><div class="kpi-icon tone-rose" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></div>
             <div class="kpi-body"><div class="kpi-value" id="kpiFailures">0</div><div class="kpi-hint" id="kpiFailuresHint">Total sampel gagal pada tanggal terpilih</div></div>
             <div class="kpi-spark" id="sparkSrFailures"></div>
           </div>
-          <div class="kpi">
+          <div class="kpi" data-sr-kpi="range" tabindex="0" role="button" title="Klik untuk melihat ringkasan harian pada rentang terpilih">
             <div class="kpi-head"><div class="kpi-label">Range Data</div><div class="kpi-icon tone-slate" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div></div>
             <div class="kpi-body"><div class="kpi-value" id="kpiDays">—</div><div class="kpi-hint" id="kpiDaysHint">Periode tanggal yang dipilih</div></div>
             <div class="kpi-spark" id="sparkSrRange"></div>
@@ -1451,17 +1456,50 @@
         } else {
           sevGrid.innerHTML = sev.map((item, idx) => {
             const hasCrit = Number(item.input03) > 0;
-            return '<div class="sev-card' + (hasCrit ? ' has-crit' : '') + '" style="--sp-d:' + (idx * 0.05).toFixed(2) + 's">' +
+            return '<button type="button" class="sev-card' + (hasCrit ? ' has-crit' : '') + '" data-sev-line="' + escapeHtml(item.line) + '" data-sev-date="' + escapeHtml(effDate) + '" style="--sp-d:' + (idx * 0.05).toFixed(2) + 's" title="Klik untuk melihat detail Line ' + escapeHtml(item.line) + ' tanggal ' + formatSingleShortDate(effDate) + '">' +
               '<div class="sev-card-head"><span>Line ' + escapeHtml(item.line) + '</span><span class="sev-crit-tag' + (hasCrit ? '' : ' ok') + '">' + (hasCrit ? (numberFormat(item.input03) + ' Kritis') : 'Aman') + '</span></div>' +
               '<div class="sev-rows">' +
                 '<div class="sev-cell is-03"><small>0/3</small><strong>' + numberFormat(item.input03) + '</strong></div>' +
                 '<div class="sev-cell is-13"><small>1/3</small><strong>' + numberFormat(item.input13) + '</strong></div>' +
                 '<div class="sev-cell"><small>2/3</small><strong>' + numberFormat(item.input23) + '</strong></div>' +
-              '</div></div>';
+              '</div></button>';
           }).join('');
         }
       }
     }
+    function openSrRangePopup(data) {
+      if (!data) return;
+      STATE.currentHistoryDayData = null;
+      $('historyTitle').textContent = 'Ringkasan Harian · ' + formatCompactRange(data.startDate, data.endDate);
+      $('historySubtitle').textContent = numberFormat(data.uploadedDays || 0) + ' dari ' + numberFormat(data.spanDays || 0) + ' hari terisi pada rentang terpilih. Klik baris tanggal untuk membuka detail mesin.';
+      if ($('exportDayExcelButton')) $('exportDayExcelButton').hidden = true;
+      if ($('printHistoryButton')) $('printHistoryButton').hidden = true;
+      const rows = (data.dailyTrend || []).map((pt, idx) => {
+        let sTot = 0, fTot = 0;
+        (data.lineTrends || []).forEach((lt) => { const d = lt.daily && lt.daily[idx]; if (d) { sTot += Number(d.totalSamples) || 0; fTot += Number(d.totalFailures) || 0; } });
+        const has = pt.successRate != null;
+        return '<tr class="' + (has ? 'history-date-row' : '') + '" ' + (has ? ('data-history-date="' + pt.date + '" tabindex="0" role="button"') : '') + '><td>' + formatSingleDate(pt.date) + '</td><td class="num">' + (has ? numberFormat(sTot) : '—') + '</td><td class="num">' + (has ? numberFormat(fTot) : '—') + '</td><td class="num rate-strong' + (has && pt.successRate < 95 ? ' rate-below-target' : '') + '">' + (has ? percent(pt.successRate) : 'Belum terisi') + '</td></tr>';
+      }).join('');
+      $('historyContent').innerHTML = '<div class="detail-table-scroll"><table class="data-table"><thead><tr><th>Tanggal</th><th class="num">Total Inspeksi</th><th class="num">Total Gagal</th><th class="num">Success Rate</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+      bindHistoryDateLinks($('historyContent'));
+      openOverlay('historyOverlay');
+    }
+    document.addEventListener('click', (event) => {
+      const sevBtn = event.target.closest('[data-sev-line]');
+      if (sevBtn) {
+        const parts = String(sevBtn.dataset.sevDate || '').split('-').map(Number);
+        if (parts.length === 3) openHistoryDialog(parts[2], parts[0], parts[1], sevBtn.dataset.sevLine);
+        return;
+      }
+      const kpiBtn = event.target.closest('[data-sr-kpi]');
+      if (kpiBtn && STATE.dashboardData) {
+        const kind = kpiBtn.dataset.srKpi;
+        if (kind === 'range') { openSrRangePopup(STATE.dashboardData); return; }
+        const eff = STATE.dashboardData.effectiveEndDate || STATE.dashboardData.endDate;
+        const parts = String(eff || '').split('-').map(Number);
+        if (parts.length === 3) openHistoryDialog(parts[2], parts[0], parts[1], '');
+      }
+    });
     function renderDashboard(data) {
       STATE.dashboardData=data;
       let effRate = Number(data.successRate) || 0;
