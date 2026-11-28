@@ -383,8 +383,8 @@
     @keyframes success-liquid-sway { from { transform:translateX(-1.5px) scaleX(.97); } to { transform:translateX(1.5px) scaleX(1.03); } }
     @media(max-width:650px) { .app-shell { grid-template-columns:1fr; } .sidebar { overflow-x:hidden; } .brand-logo { width:150px; } .hero-bottles { width:145px; height:92px; } }
     /* Project Tab Switcher & Daily Workspace Container */
-    .project-switcher { display:inline-flex; align-items:center; align-self:flex-end; background:#e6f0ee; padding:4px; border-radius:11px; border:1px solid #cce0dc; height:42px; gap:4px; box-shadow:inset 0 1px 2px #092b3a0d; }
-    .project-tab { display:inline-flex; align-items:center; gap:7px; height:32px; padding:0 14px; border-radius:8px; border:0; font-size:12.5px; font-weight:800; color:#41616b; background:transparent; cursor:pointer; transition:all .18s ease; white-space:nowrap; }
+    .project-switcher { display:inline-flex; align-items:center; align-self:flex-end; background:#e6f0ee; padding:3px; border-radius:10px; border:1px solid #cce0dc; height:38px; gap:3px; box-shadow:inset 0 1px 2px #092b3a0d; flex:none; }
+    .project-tab { display:inline-flex; align-items:center; gap:5px; height:30px; padding:0 10px; border-radius:7px; border:0; font-size:11.5px; font-weight:800; color:#41616b; background:transparent; cursor:pointer; transition:all .18s ease; white-space:nowrap; }
     .project-tab:hover:not(.active) { color:#092b3a; background:#ffffff88; }
     .project-tab.active { background:linear-gradient(120deg,#0b3a4d,#137c9b); color:#fff; box-shadow:0 3px 10px #137c9b35; }
     .topbar-right { display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-left:auto; }
@@ -515,7 +515,7 @@
           <div class="project-switcher" role="tablist" aria-label="Pilih Project">
             <button type="button" class="project-tab" id="tabSwitchDaily" onclick="switchProjectTab('daily')"><span>📊</span><span>Daily Report</span></button>
             <button type="button" class="project-tab active" id="tabSwitchSuccess" onclick="switchProjectTab('success')"><span>📈</span><span>Success Rate</span></button>
-            <button type="button" class="project-tab" id="tabSwitchPm" onclick="switchProjectTab('pm')"><span>🛠️</span><span>Plan Maintenance</span><span id="srPmTabBadge" class="pm-tab-badge" hidden>0</span></button>
+            <button type="button" class="project-tab" id="tabSwitchPm" onclick="switchProjectTab('pm')" title="Plan Maintenance (PM)"><span>🛠️</span><span>Plan PM</span><span id="srPmTabBadge" class="pm-tab-badge" hidden>0</span></button>
           </div>
           <div class="control" id="dashCtrlStartWrap"><label for="dashboardStart">Pilihan Range Hari</label><input id="dashboardStart" type="date"></div>
           <div class="control" id="dashCtrlEndWrap"><label for="dashboardEnd">Sampai</label><input id="dashboardEnd" type="date"></div>
