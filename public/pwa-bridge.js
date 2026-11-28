@@ -529,12 +529,14 @@
 
       /* -------- EFEK BLUR LAYAR UTAMA SAAT POP-UP AKTIF -------- */
       body.pwa-nav-blur #dailyWorkspaceContainer,
+      body.pwa-nav-blur #pmWorkspaceContainer,
       body.pwa-nav-blur #successWorkspaceContainer {
         filter: blur(7px) brightness(0.88);
         transform: scale(0.99);
         transition: filter 0.28s cubic-bezier(0.22, 1, 0.36, 1), transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
       }
       #dailyWorkspaceContainer,
+      #pmWorkspaceContainer,
       #successWorkspaceContainer {
         transition: filter 0.25s ease, transform 0.25s ease;
       }
@@ -814,12 +816,22 @@
         { id: 'history',   icon: '▤', label: 'Histori Data' },
         { id: 'download',  icon: '⇩', label: 'Unduh Grafik' },
         { id: 'urls',      icon: '🔗', label: 'Alamat HTML' }
+      ],
+      pm: [
+        { id: 'dashboard', icon: '◫', label: 'Dashboard' },
+        { id: 'schedules', icon: '📅', label: 'Jadwal PM' },
+        { id: 'parts',     icon: '🧩', label: 'Master Part' },
+        { id: 'logs',      icon: '📜', label: 'Riwayat PM' }
       ]
     };
 
-    let activePages = { daily: 'dashboard', success: 'dashboard' };
+    let activePages = { daily: 'dashboard', success: 'dashboard', pm: 'dashboard' };
 
     function getCurrentProject() {
+      const pmWrap = document.getElementById('pmWorkspaceContainer');
+      if (pmWrap && pmWrap.classList.contains('active')) {
+        return 'pm';
+      }
       const dailyWrap = document.getElementById('dailyWorkspaceContainer');
       if (dailyWrap && dailyWrap.classList.contains('active')) {
         return 'daily';
@@ -858,6 +870,10 @@
         <button type="button" data-pwa-proj="success" class="pwa-proj-btn">
           <span class="pwa-item-icon">📈</span>
           <span>Success Rate</span>
+        </button>
+        <button type="button" data-pwa-proj="pm" class="pwa-proj-btn">
+          <span class="pwa-item-icon">🛠️</span>
+          <span>Plan PM</span>
         </button>
       `;
 
@@ -908,9 +924,9 @@
         const curPage = activePages[proj] || 'dashboard';
 
         document.getElementById('pwaMenuHeader').textContent =
-          proj === 'daily' ? 'MENU DAILY REPORT' : 'MENU SUCCESS RATE';
+          proj === 'daily' ? 'MENU DAILY REPORT' : (proj === 'pm' ? 'MENU PLAN PM' : 'MENU SUCCESS RATE');
         document.getElementById('pwaProjFabIcon').textContent =
-          proj === 'daily' ? '📊' : '📈';
+          proj === 'daily' ? '📊' : (proj === 'pm' ? '🛠️' : '📈');
 
         document.getElementById('pwaMenuItems').innerHTML = items
           .map(
@@ -930,9 +946,11 @@
           const isAct = btn.getAttribute('data-pwa-proj') === proj;
           btn.classList.toggle('active', isAct);
           const pName = btn.getAttribute('data-pwa-proj');
+          const pIcon = pName === 'daily' ? '📊' : (pName === 'pm' ? '🛠️' : '📈');
+          const pLabel = pName === 'daily' ? 'Daily Report' : (pName === 'pm' ? 'Plan PM' : 'Success Rate');
           btn.innerHTML = `
-            <span class="pwa-item-icon">${pName === 'daily' ? '📊' : '📈'}</span>
-            <span>${pName === 'daily' ? 'Daily Report' : 'Success Rate'}</span>
+            <span class="pwa-item-icon">${pIcon}</span>
+            <span>${pLabel}</span>
             ${isAct ? '<span class="pwa-item-dot"></span>' : ''}
           `;
         });
@@ -946,6 +964,11 @@
 
             if (proj === 'daily') {
               const frame = document.getElementById('dailyWorkspaceFrame');
+              if (frame && frame.contentWindow && typeof frame.contentWindow.page === 'function') {
+                frame.contentWindow.page(targetMenu);
+              }
+            } else if (proj === 'pm') {
+              const frame = document.getElementById('pmWorkspaceFrame');
               if (frame && frame.contentWindow && typeof frame.contentWindow.page === 'function') {
                 frame.contentWindow.page(targetMenu);
               }
