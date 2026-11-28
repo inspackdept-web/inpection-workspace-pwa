@@ -70,13 +70,24 @@
     .hero-bottle::after { content:""; position:absolute; left:3px; right:3px; bottom:3px; height:43%; border-radius:3px 3px 6px 6px; background:linear-gradient(180deg,#ffc166,#f28c28); }
     .hero-bottle:nth-child(2) { width:40px; height:98px; }
     .hero-bottle:nth-child(2)::before { left:10px; }
-    .kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:16px; }
-    .kpi { min-height:117px; padding:17px 14px; border:1px solid var(--line); border-radius:13px; background:var(--white); box-shadow:var(--shadow); text-align:center; }
-    .kpi-label { color:var(--muted); font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
-    .kpi-value { margin-top:8px; font-size:27px; line-height:1.15; font-weight:850; font-variant-numeric:tabular-nums; }
-    #kpiDays { font-size:15px; line-height:1.35; }
-    .rate-below-target { color:#c93636 !important; }
-    .kpi-hint { margin-top:4px; color:#789099; font-size:11px; }
+    .kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:13px; margin-bottom:16px; }
+    .kpi { position:relative; display:flex; flex-direction:column; justify-content:space-between; min-height:148px; padding:16px 18px 12px; border:1px solid var(--line); border-radius:14px; background:var(--white); box-shadow:0 3px 14px rgba(16,42,55,.05); text-align:left; overflow:hidden; transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; }
+    .kpi:hover { transform:translateY(-2px); box-shadow:0 10px 24px rgba(16,42,55,.09); border-color:#bfd7d3; }
+    .kpi-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .kpi-label { color:#5b7480; font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; line-height:1.25; }
+    .kpi-icon { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; flex:none; }
+    .kpi-icon svg { width:18px; height:18px; stroke-width:2.1; }
+    .kpi-icon.tone-emerald { background:#ecfdf5; color:#059669; }
+    .kpi-icon.tone-rose { background:#fff1f2; color:#e11d48; }
+    .kpi-icon.tone-teal { background:#f0fdfa; color:#0d9488; }
+    .kpi-icon.tone-blue { background:#eff6ff; color:#2563eb; }
+    .kpi-body { margin:10px 0 4px; }
+    .kpi-value { margin:0; min-height:30px; display:flex; align-items:baseline; font-size:clamp(20px,1.85vw,25px); line-height:1.2; font-weight:850; letter-spacing:-.02em; color:#0e2430; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    #kpiDays { font-size:clamp(16px,1.4vw,20px); line-height:1.25; letter-spacing:-.015em; }
+    .rate-below-target { color:#dc2626 !important; }
+    .kpi-hint { margin:3px 0 0; color:#708892; font-size:11.5px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .kpi-spark { margin-top:8px; height:36px; width:100%; display:block; }
+    .kpi-spark svg { display:block; width:100%; height:36px; overflow:visible; }
     .shift-analysis-panel { width:100%; margin:0 0 16px; }
     .chart-mode-toggle { display:flex; gap:4px; padding:4px; border:1px solid var(--line); border-radius:10px; background:#f4f8f7; }
     .chart-mode-toggle button { min-height:34px; padding:0 12px; border:0; border-radius:7px; color:#5b737a; background:transparent; font-size:11px; font-weight:800; transition:color .2s,background .2s,box-shadow .2s; }
@@ -768,10 +779,26 @@
           </svg>
         </section>
         <section class="kpis" aria-label="Ringkasan bulan">
-          <div class="kpi"><div class="kpi-label">Total Success Rate</div><div class="kpi-value" id="kpiRate">0%</div><div class="kpi-hint" id="kpiRateHint">Success Rate all machine</div></div>
-          <div class="kpi"><div class="kpi-label">Total Sampel</div><div class="kpi-value" id="kpiSamples">0</div><div class="kpi-hint" id="kpiSamplesHint">Total sampel pada tanggal terpilih</div></div>
-          <div class="kpi"><div class="kpi-label">Total Sampel Gagal</div><div class="kpi-value" id="kpiFailures">0</div><div class="kpi-hint" id="kpiFailuresHint">Total sampel gagal pada tanggal terpilih</div></div>
-          <div class="kpi"><div class="kpi-label">Range Data</div><div class="kpi-value" id="kpiDays">—</div><div class="kpi-hint">Periode tanggal yang dipilih</div></div>
+          <div class="kpi">
+            <div class="kpi-head"><div class="kpi-label">Total Success Rate</div><div class="kpi-icon tone-emerald" id="kpiRateIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div>
+            <div class="kpi-body"><div class="kpi-value" id="kpiRate">0%</div><div class="kpi-hint" id="kpiRateHint">Success Rate all machine</div></div>
+            <div class="kpi-spark" id="sparkSrRate"></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-head"><div class="kpi-label">Total Sampel</div><div class="kpi-icon tone-teal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6l-5 8.5A2 2 0 0 0 6.7 21h10.6a2 2 0 0 0 1.7-3.5L14 9V3"/><path d="M8.5 14h7"/></svg></div></div>
+            <div class="kpi-body"><div class="kpi-value" id="kpiSamples">0</div><div class="kpi-hint" id="kpiSamplesHint">Total sampel pada tanggal terpilih</div></div>
+            <div class="kpi-spark" id="sparkSrSamples"></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-head"><div class="kpi-label">Total Sampel Gagal</div><div class="kpi-icon tone-rose" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></div>
+            <div class="kpi-body"><div class="kpi-value" id="kpiFailures">0</div><div class="kpi-hint" id="kpiFailuresHint">Total sampel gagal pada tanggal terpilih</div></div>
+            <div class="kpi-spark" id="sparkSrFailures"></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-head"><div class="kpi-label">Range Data</div><div class="kpi-icon tone-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div></div>
+            <div class="kpi-body"><div class="kpi-value" id="kpiDays">—</div><div class="kpi-hint" id="kpiDaysHint">Periode tanggal yang dipilih</div></div>
+            <div class="kpi-spark" id="sparkSrRange"></div>
+          </div>
         </section>
         <section class="panel shift-analysis-panel">
           <div class="panel-head"><div><h2 id="shiftAnalysisTitle">Success Rate per Shift</h2><p id="shiftAnalysisSubtitle" class="panel-sub">Gabungan seluruh area per line dan shift pada rentang terpilih</p></div><div class="chart-mode-toggle" role="group" aria-label="Pilih grafik analisis"><button type="button" class="active" data-analysis-mode="shift">Per Shift</button><button type="button" data-analysis-mode="line">Average per Line</button></div></div>
@@ -1275,17 +1302,98 @@
         setStatus('dashboardStatus',error.message||String(error),'error');
       }).getDashboardData(startDate,endDate);
     }
+    function buildSrSparkArea(values, stroke, gradId, targetVal) {
+      const clean = (values || []).map((v) => (v == null || !isFinite(Number(v)) ? null : Number(v)));
+      const nonNull = clean.filter((v) => v != null);
+      if (!nonNull.length) return '<svg viewBox="0 0 180 36" preserveAspectRatio="none"><line x1="2" y1="30" x2="178" y2="30" stroke="#e2ecea" stroke-width="1.5" stroke-dasharray="3 3"/></svg>';
+      const pts = nonNull.length === 1 ? [nonNull[0], nonNull[0]] : nonNull;
+      const max = targetVal != null ? 100 : Math.max(1, ...pts);
+      const min = targetVal != null ? Math.min(75, ...pts) : Math.min(0, ...pts);
+      const span = Math.max(1e-6, max - min);
+      const w = 180, h = 36, padX = 3, padTop = 5, padBot = 4, plotW = w - padX * 2, plotH = h - padTop - padBot;
+      const coords = pts.map((v, i) => ({ x: padX + (i / (pts.length - 1)) * plotW, y: padTop + (1 - (v - min) / span) * plotH }));
+      const linePath = coords.map((p, i) => (i ? 'L' : 'M') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+      const areaPath = linePath + ' L' + coords[coords.length - 1].x.toFixed(1) + ',' + (h - 1) + ' L' + coords[0].x.toFixed(1) + ',' + (h - 1) + ' Z';
+      const last = coords[coords.length - 1];
+      let targetLine = '';
+      if (targetVal != null) {
+        const ty = (padTop + (1 - (targetVal - min) / span) * plotH).toFixed(1);
+        targetLine = '<line x1="2" y1="' + ty + '" x2="178" y2="' + ty + '" stroke="#e11d48" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="3 3"/>';
+      }
+      return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none"><defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + stroke + '" stop-opacity="0.26"/><stop offset="100%" stop-color="' + stroke + '" stop-opacity="0.01"/></linearGradient></defs>' + targetLine + '<path d="' + areaPath + '" fill="url(#' + gradId + ')"/><path d="' + linePath + '" fill="none" stroke="' + stroke + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="' + last.x.toFixed(1) + '" cy="' + last.y.toFixed(1) + '" r="2.8" fill="' + stroke + '" stroke="#fff" stroke-width="1.2"/></svg>';
+    }
+    function buildSrRangeBars(trend) {
+      const arr = trend || [];
+      if (!arr.length) return '<svg viewBox="0 0 180 36" preserveAspectRatio="none"><line x1="2" y1="30" x2="178" y2="30" stroke="#e2ecea" stroke-width="1.5" stroke-dasharray="3 3"/></svg>';
+      const w = 180, h = 36, gap = Math.max(2, arr.length > 20 ? 2 : 3.5);
+      const barW = Math.max(3, (w - gap * (arr.length - 1)) / arr.length);
+      const rects = arr.map((pt, i) => {
+        const has = pt && pt.successRate != null;
+        const bh = has ? Math.max(8, Math.round(((Math.max(70, Math.min(100, Number(pt.successRate))) - 70) / 30) * (h - 8)) + 6) : 5;
+        const x = (i * (barW + gap)).toFixed(1), y = (h - bh).toFixed(1);
+        const fill = has ? (Number(pt.successRate) < 95 ? '#fb7185' : '#2563eb') : '#e2ecea';
+        return '<rect x="' + x + '" y="' + y + '" width="' + barW.toFixed(1) + '" height="' + bh + '" rx="2" fill="' + fill + '" opacity="' + (has ? '0.88' : '0.75') + '"/>';
+      }).join('');
+      return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' + rects + '</svg>';
+    }
+    function formatSingleShortDate(dateStr) {
+      if (!dateStr) return '—';
+      return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(dateStr + 'T00:00:00Z'));
+    }
+    function formatCompactRange(startDate, endDate) {
+      if (!startDate || !endDate) return '—';
+      const s = new Date(startDate + 'T00:00:00Z'), e = new Date(endDate + 'T00:00:00Z');
+      const sameMonth = s.getUTCFullYear() === e.getUTCFullYear() && s.getUTCMonth() === e.getUTCMonth();
+      if (sameMonth) {
+        const my = new Intl.DateTimeFormat('id-ID', { month: 'short', year: 'numeric', timeZone: 'UTC' }).format(e);
+        return s.getUTCDate() + ' – ' + e.getUTCDate() + ' ' + my;
+      }
+      const sd = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(s);
+      const ed = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(e);
+      return sd + ' – ' + ed;
+    }
+    function renderSrKpiSparks(data) {
+      const trend = data.dailyTrend || [];
+      const rateColor = data.successRate < 95 ? '#e11d48' : '#059669';
+      const rateIcon = $('kpiRateIcon');
+      if (rateIcon) {
+        rateIcon.classList.toggle('tone-rose', data.successRate < 95);
+        rateIcon.classList.toggle('tone-emerald', data.successRate >= 95);
+      }
+      const dailySamples = trend.map((_, idx) => {
+        let sum = 0, has = false;
+        (data.lineTrends || []).forEach((lt) => {
+          const d = lt.daily && lt.daily[idx];
+          if (d) { sum += Number(d.totalSamples) || 0; has = true; }
+        });
+        return has ? sum : null;
+      });
+      const dailyFailures = trend.map((_, idx) => {
+        let sum = 0, has = false;
+        (data.lineTrends || []).forEach((lt) => {
+          const d = lt.daily && lt.daily[idx];
+          if (d) { sum += Number(d.totalFailures) || 0; has = true; }
+        });
+        return has ? sum : null;
+      });
+      if ($('sparkSrRate')) $('sparkSrRate').innerHTML = buildSrSparkArea(trend.map((t) => t.successRate), rateColor, 'srSpRate', 95);
+      if ($('sparkSrSamples')) $('sparkSrSamples').innerHTML = buildSrSparkArea(dailySamples, '#0d9488', 'srSpSamp', null);
+      if ($('sparkSrFailures')) $('sparkSrFailures').innerHTML = buildSrSparkArea(dailyFailures, '#e11d48', 'srSpFail', null);
+      if ($('sparkSrRange')) $('sparkSrRange').innerHTML = buildSrRangeBars(trend);
+    }
     function renderDashboard(data) {
       STATE.dashboardData=data;
       $('kpiRate').textContent=percent(data.successRate);
       $('kpiRate').classList.toggle('rate-below-target',data.successRate<95);
       $('kpiSamples').textContent=numberFormat(data.totalSampleCount);
       $('kpiFailures').textContent=numberFormat(data.totalFailures);
-      const selectedDate=formatRangeDate(data.endDate,data.endDate);
-      $('kpiRateHint').textContent='Success Rate all machine pada tanggal '+selectedDate;
-      $('kpiSamplesHint').textContent='Total sampel pada tanggal '+selectedDate;
-      $('kpiFailuresHint').textContent='Total sampel gagal pada tanggal '+selectedDate;
-      $('kpiDays').textContent=formatRangeDate(data.startDate,data.endDate);
+      const selectedDate=formatSingleShortDate(data.endDate);
+      $('kpiRateHint').textContent='All machine · '+selectedDate;
+      $('kpiSamplesHint').textContent='Total sampel · '+selectedDate;
+      $('kpiFailuresHint').textContent='Sampel gagal · '+selectedDate;
+      $('kpiDays').textContent=formatCompactRange(data.startDate,data.endDate);
+      if ($('kpiDaysHint')) $('kpiDaysHint').textContent=numberFormat(data.uploadedDays||0)+' dari '+numberFormat(data.spanDays||0)+' hari terisi';
+      renderSrKpiSparks(data);
       $('lineSummaryBody').innerHTML=data.lineSummary.map((item)=>'<tr><td><span class="line-pill"><i class="line-mark" style="background:'+LINE_COLORS[item.line]+'"></i>Line '+escapeHtml(item.line)+'</span></td><td class="num">'+numberFormat(item.totalSamples)+'</td><td class="num">'+numberFormat(item.totalFailures)+'</td><td class="num rate-strong'+(item.hasData&&item.successRate<95?' rate-below-target':'')+'">'+(item.hasData?percent(item.successRate):'—')+'</td></tr>').join('');
       const comments=data.comments||[];
       renderDashboardComments(comments.filter((item)=>item.chartType!=='line'),data.startDate,data.endDate,'daily');
