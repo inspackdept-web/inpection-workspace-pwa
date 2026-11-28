@@ -141,6 +141,7 @@
     .main.presenting .kpi-card{padding:20px 22px 14px;border-radius:16px;min-height:172px}
     .main.presenting .kpi-card .kpi-value{font-size:clamp(26px,2.4vw,34px)}
     .main.presenting .kpi-card .kpi-value.kpi-value-text{font-size:clamp(20px,1.8vw,26px)}
+    html.in-workspace .project-switcher{display:none!important}
     .topbar{gap:12px!important;flex-wrap:wrap!important}
     .topbar-actions{gap:8px!important;flex-wrap:wrap!important}
     .project-switcher{position:relative!important;padding:3px!important;height:38px!important;gap:3px!important;border-radius:10px!important;flex:none!important}
@@ -255,6 +256,7 @@
   function getGasRunner(){if(typeof google!=='undefined'&&google.script&&google.script.run)return google.script.run;if(window.parent&&window.parent.google&&window.parent.google.script&&window.parent.google.script.run)return window.parent.google.script.run;return null;}
   function call(name,...args){return new Promise((resolve,reject)=>{const runner=getGasRunner();if(!runner)return reject(new Error('Google Apps Script runner tidak tersedia.'));runner.withSuccessHandler(resolve).withFailureHandler(e=>reject(new Error(e.message||e)))[name](...args);});}
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  if(window.top!==window.self)document.documentElement.classList.add('in-workspace');
   function positionDrSlider(btn,instant){const sl=$('drProjectSlider'),sw=sl&&sl.parentElement,t=btn||(sw&&sw.querySelector('.project-tab.active'));if(!sl||!t||!t.offsetWidth)return;if(instant)sl.style.transition='none';sl.style.width=t.offsetWidth+'px';sl.style.transform='translateX('+t.offsetLeft+'px)';if(instant)requestAnimationFrame(()=>{sl.style.transition='';});}
   window.slideDrTab=function(tab,btn){if(tab==='daily'){positionDrSlider(btn,false);return;}const sw=btn&&btn.parentElement;if(sw){sw.querySelectorAll('.project-tab').forEach(b=>b.classList.toggle('active',b===btn));positionDrSlider(btn,false);}setTimeout(()=>{if(window.parent&&window.parent.switchProjectTab){window.parent.switchProjectTab(tab);setTimeout(()=>{if(sw){const own=sw.querySelector('[data-tab="daily"]');sw.querySelectorAll('.project-tab').forEach(b=>b.classList.toggle('active',b===own));positionDrSlider(own,true);}},80);}else if(tab==='pm'){window.location.href='/pm.html';}},220);};
   window.addEventListener('resize',()=>positionDrSlider(null,true));

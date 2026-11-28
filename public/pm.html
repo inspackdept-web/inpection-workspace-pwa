@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Plan Maintenance (PM) | PT KCI Inspection Workspace</title>
+  <script>if(window.top!==window.self)document.documentElement.classList.add('in-workspace');</script>
   <script src="/pwa-bridge.js?v=10"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <style>
@@ -198,7 +199,8 @@
     .pm-leg-dot.yellow{background:#fef3c7;border:1.5px solid #d97706}
     .pm-leg-dot.green{background:#dcfce7;border:1.5px solid #059669}
     .pm-leg-dot.empty{background:#f8fafc;border:1.5px dashed #cbd5e1}
-    .pm-matrix-wrap{overflow:auto;max-height:66vh;border:1px solid var(--line);border-radius:11px;background:#fff}
+    .pm-matrix-wrap{overflow-x:auto;overflow-y:visible;border:1px solid var(--line);border-radius:11px;background:#fff}
+    html.in-workspace .project-switcher{display:none!important}
     .pm-matrix{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:11.5px}
     .pm-matrix th,.pm-matrix td{border-right:1px solid #e6efed;border-bottom:1px solid #e6efed;padding:0;text-align:center}
     .pm-matrix thead th{position:sticky;z-index:3;background:#f1f7f6;font-weight:850}
