@@ -57,6 +57,43 @@
     .section.active{display:block;animation:fadeSlide .22s ease}
     @keyframes fadeSlide{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
+    .hero{min-height:152px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:20px 24px;margin-bottom:16px;border-radius:16px;color:#fff;background:linear-gradient(112deg,#0b3a4d,#116e7e 62%,#198d80);box-shadow:0 8px 24px rgba(18,59,72,.14)}
+    .hero-copy{position:relative;z-index:1;min-width:220px;flex:1}
+    .hero-tag{color:#91e0c2;font-size:10px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}
+    .hero h3{margin:5px 0 4px;font-size:21px;font-weight:850;color:#fff;letter-spacing:-.015em}
+    .hero p{max-width:470px;margin:0;color:#c8e5e1;font-size:13px;line-height:1.45}
+    .hero-controls-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+    .hero-pill-bar{display:inline-flex;align-items:center;gap:4px;padding:3px 5px 3px 11px;border-radius:999px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px)}
+    .hero-pill-label{font-size:9.5px;font-weight:850;letter-spacing:.09em;text-transform:uppercase;color:#b6e6dc;margin-right:4px;user-select:none}
+    .hero-bottle-btn{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 10px;border:0;border-radius:999px;background:transparent;color:#e6f7f3;font-size:11px;font-weight:750;cursor:pointer;transition:all .16s ease}
+    .hero-bottle-btn:hover:not(.active){background:rgba(255,255,255,.12);color:#fff}
+    .hero-bottle-btn.active{background:#fff;color:#092b3a;box-shadow:0 2px 7px rgba(4,22,32,.22)}
+    .hero-bottle-dot{width:8px;height:8px;border-radius:50%;flex:none;box-shadow:inset 0 1px 2px rgba(255,255,255,.65),0 1px 2px rgba(0,0,0,.25)}
+    .hero-bottle-dot.dot-green{background:radial-gradient(circle at 35% 35%,#4ade80,#15803d)}
+    .hero-bottle-dot.dot-amber{background:radial-gradient(circle at 35% 35%,#fbbf24,#b45309)}
+    .hero-bottle-dot.dot-flint{background:radial-gradient(circle at 35% 35%,#ffffff,#94a3b8)}
+    .hero-speed-pill{display:inline-flex;align-items:center;gap:7px;padding:3px 11px;height:30px;border-radius:999px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px)}
+    .hero-speed-slider{width:76px;height:4px;accent-color:#6dd1ae;cursor:pointer;margin:0}
+    .hero-speed-val{font-size:11px;font-weight:850;color:#fff;font-variant-numeric:tabular-nums;min-width:28px;text-align:right}
+    .hero-art{width:490px;max-width:56%;height:auto;flex:none;filter:drop-shadow(0 8px 16px rgba(4,18,28,.38))}
+    @keyframes pmBottlesRTL{0%{transform:translateX(0)}100%{transform:translateX(-28px)}}
+    @keyframes pmBeltRTL{0%{stroke-dashoffset:0}100%{stroke-dashoffset:16}}
+    @keyframes pmRollSpin{0%{stroke-dashoffset:0}100%{stroke-dashoffset:14}}
+    @keyframes pmTowerBlink{0%,100%{opacity:.55}50%{opacity:1}}
+    @keyframes pmScanPulse{0%,100%{opacity:.25}50%{opacity:.95}}
+    @keyframes pmFpGlow{0%,100%{opacity:.72;transform:scale(.96)}50%{opacity:1;transform:scale(1.06)}}
+    @keyframes pmRedStrobe{0%,100%{opacity:1}40%{opacity:.35}70%{opacity:.95}}
+    .pm-bottles-track{animation:pmBottlesRTL var(--hero-speed,1.2s) linear infinite}
+    .pm-belt-dashes{animation:pmBeltRTL calc(var(--hero-speed,1.2s) * 0.65) linear infinite}
+    .pm-roll-ticks{animation:pmRollSpin calc(var(--hero-speed,1.2s) * 0.8) linear infinite}
+    .pm-tower-green{animation:pmTowerBlink 1.7s ease-in-out infinite}
+    .pm-scan-beam{animation:pmScanPulse .9s ease-in-out infinite}
+    .pm-scan-beam-d{animation:pmScanPulse .9s ease-in-out .45s infinite}
+    .pm-fp-aura{transform-box:fill-box;transform-origin:center;animation:pmFpGlow 1s ease-in-out infinite}
+    .pm-red-1{animation:pmRedStrobe .65s ease-in-out infinite}
+    .pm-red-2{animation:pmRedStrobe .8s ease-in-out .25s infinite}
+    @media(max-width:960px){.hero{flex-direction:column;align-items:flex-start}.hero-art{width:100%;max-width:520px}}
+
     .alert-banner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;margin-bottom:16px;border-radius:12px;background:linear-gradient(90deg,#fff1f2,#fffbeb);border:1px solid #fecdd3;color:#9f1239;font-size:12.5px}
     .alert-banner.is-warn{background:linear-gradient(90deg,#fffbeb,#fff7ed);border-color:#fde68a;color:#92400e}
     .alert-banner[hidden]{display:none}
@@ -196,6 +233,151 @@
 
     <!-- PAGE 1: JADWAL PM -->
     <section class="section active" id="page-schedules">
+      <section class="hero" id="pmHeroSection" style="--hero-speed:1.2s">
+        <div class="hero-copy">
+          <div class="hero-tag">GLASS PRODUCTION · PREVENTIVE MAINTENANCE</div>
+          <h3>Jadwal Plan Maintenance</h3>
+          <p>Pantau siklus PM part mesin inspeksi (ICK · MULTI 4 · MCAL 4 · FP), due date otomatis, dan cegah downtime sebelum jatuh tempo.</p>
+          <div class="hero-controls-row">
+            <div class="hero-pill-bar" role="group" aria-label="Pilih warna botol">
+              <span class="hero-pill-label">BOTOL</span>
+              <button type="button" class="hero-bottle-btn" data-pm-bottle="green" onclick="setPmHeroBottle('green')"><i class="hero-bottle-dot dot-green"></i><span>Green</span></button>
+              <button type="button" class="hero-bottle-btn active" data-pm-bottle="amber" onclick="setPmHeroBottle('amber')"><i class="hero-bottle-dot dot-amber"></i><span>Amber</span></button>
+              <button type="button" class="hero-bottle-btn" data-pm-bottle="flint" onclick="setPmHeroBottle('flint')"><i class="hero-bottle-dot dot-flint"></i><span>Flint</span></button>
+            </div>
+            <label class="hero-speed-pill" title="Atur kecepatan animasi (0.5s - 4.0s)">
+              <span class="hero-pill-label" style="margin-right:0">SPEED</span>
+              <input type="range" class="hero-speed-slider" id="pmHeroSpeedInput" min="0.5" max="4.0" step="0.1" value="1.2" oninput="setPmHeroSpeed(this.value)">
+              <span class="hero-speed-val" id="pmHeroSpeedVal">1.2s</span>
+            </label>
+          </div>
+        </div>
+        <svg class="hero-art" viewBox="0 0 540 185" fill="none" role="img" aria-label="Animasi alur botol dari kanan ke kiri: ICK, MULTI 4, MCAL 4, dan FP">
+          <defs>
+            <linearGradient id="pmCabYellow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFC414"/><stop offset="55%" stop-color="#F7AF00"/><stop offset="100%" stop-color="#D98A00"/></linearGradient>
+            <linearGradient id="pmCabTop" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#FFD038"/><stop offset="100%" stop-color="#F2A400"/></linearGradient>
+            <linearGradient id="pmIckBlue" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1d4ed8"/><stop offset="45%" stop-color="#2563eb"/><stop offset="100%" stop-color="#172554"/></linearGradient>
+            <linearGradient id="pmMaroonRoll" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7f1d1d"/><stop offset="45%" stop-color="#c24a48"/><stop offset="100%" stop-color="#450a0a"/></linearGradient>
+            <linearGradient id="pmStainless" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="25%" stop-color="#ffffff"/><stop offset="65%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#475569"/></linearGradient>
+            <radialGradient id="pmFpRedGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/><stop offset="35%" stop-color="#ff2a2a" stop-opacity="0.82"/><stop offset="72%" stop-color="#dc2626" stop-opacity="0.28"/><stop offset="100%" stop-color="#7f1d1d" stop-opacity="0"/></radialGradient>
+            <linearGradient id="pmBottleGrad" x1="0" y1="0" x2="1" y2="0"><stop id="pm_bCol1" offset="0%" stop-color="#451a03"/><stop id="pm_bCol2" offset="40%" stop-color="#d97706"/><stop id="pm_bCol3" offset="75%" stop-color="#78350f"/><stop id="pm_bCol4" offset="100%" stop-color="#270e02"/></linearGradient>
+            <clipPath id="pmLineClip"><rect x="8" y="88" width="524" height="44" rx="2"/></clipPath>
+            <g id="pmBottle">
+              <ellipse cx="6" cy="31" rx="4.6" ry="1.3" fill="#06221A" opacity="0.45"/>
+              <path d="M4.4 3 H7.6 V8.5 C7.6 11 10.2 12.8 10.2 16 V29 C10.2 30.2 9.3 31 8.2 31 H3.8 C2.7 31 1.8 30.2 1.8 29 V16 C1.8 12.8 4.4 11 4.4 8.5 Z" fill="url(#pmBottleGrad)" stroke="#fde68a" stroke-opacity="0.45" stroke-width="0.6"/>
+              <rect x="4" y="2" width="4" height="1.5" rx="0.6" fill="url(#pmBottleGrad)" stroke="#fde68a" stroke-opacity="0.5" stroke-width="0.45"/>
+              <path d="M3.6 16.5 V27.5" stroke="#fff" stroke-opacity="0.45" stroke-width="1" stroke-linecap="round"/>
+            </g>
+          </defs>
+
+          <!-- Floor Shadow -->
+          <ellipse cx="270" cy="176" rx="258" ry="6" fill="#041922" opacity="0.45"/>
+
+          <!-- Continuous Conveyor (Right -> Left) -->
+          <rect x="8" y="121" width="524" height="14" rx="2" fill="#182228"/>
+          <rect x="8" y="118.5" width="524" height="3.5" fill="#7D969E"/>
+          <line x1="10" y1="120.2" x2="530" y2="120.2" stroke="#D5EAE6" stroke-width="1.4" stroke-dasharray="8 8" class="pm-belt-dashes"/>
+          <g clip-path="url(#pmLineClip)">
+            <g class="pm-bottles-track">
+              <use href="#pmBottle" x="8" y="90"/><use href="#pmBottle" x="36" y="90"/><use href="#pmBottle" x="64" y="90"/><use href="#pmBottle" x="92" y="90"/><use href="#pmBottle" x="120" y="90"/><use href="#pmBottle" x="148" y="90"/><use href="#pmBottle" x="176" y="90"/><use href="#pmBottle" x="204" y="90"/><use href="#pmBottle" x="232" y="90"/><use href="#pmBottle" x="260" y="90"/><use href="#pmBottle" x="288" y="90"/><use href="#pmBottle" x="316" y="90"/><use href="#pmBottle" x="344" y="90"/><use href="#pmBottle" x="372" y="90"/><use href="#pmBottle" x="400" y="90"/><use href="#pmBottle" x="428" y="90"/><use href="#pmBottle" x="456" y="90"/><use href="#pmBottle" x="484" y="90"/><use href="#pmBottle" x="512" y="90"/><use href="#pmBottle" x="540" y="90"/>
+            </g>
+            <rect x="8" y="113" width="524" height="1.8" fill="#E6F4F1" opacity="0.6"/>
+          </g>
+
+          <!-- 1. PALING KANAN: MESIN ICK (Squeeze Tester) -->
+          <g transform="translate(418,18)">
+            <rect x="6" y="138" width="96" height="4" rx="1" fill="#1c2327"/>
+            <rect x="10" y="142" width="4" height="12" fill="#2a3439"/><rect x="94" y="142" width="4" height="12" fill="#2a3439"/>
+            <rect x="4" y="14" width="100" height="124" rx="4" fill="#0f172a" stroke="#1e293b" stroke-width="1.2"/>
+            <path d="M2 6 H106 V18 H2 Z" fill="url(#pmCabTop)" stroke="#854d0e" stroke-width="1"/>
+            <rect x="8" y="20" width="38" height="46" rx="3" fill="url(#pmIckBlue)" stroke="#1e3a8a" stroke-width="1"/>
+            <rect x="62" y="20" width="38" height="46" rx="3" fill="url(#pmIckBlue)" stroke="#1e3a8a" stroke-width="1"/>
+            <rect x="48" y="26" width="12" height="52" rx="2" fill="#94a3b8" stroke="#334155" stroke-width="0.8"/>
+            <rect x="16" y="38" width="22" height="6" rx="3" fill="#cbd5e1"/><circle cx="27" cy="41" r="3" fill="#facc15"/>
+            <rect x="70" y="38" width="22" height="6" rx="3" fill="#cbd5e1"/><circle cx="81" cy="41" r="3" fill="#facc15"/>
+            <rect x="14" y="92" width="22" height="22" rx="4" fill="url(#pmMaroonRoll)" stroke="#450a0a" stroke-width="0.9"/>
+            <line class="pm-roll-ticks" x1="16" y1="103" x2="34" y2="103" stroke="#fca5a5" stroke-width="1.6" stroke-dasharray="4 4"/>
+            <rect x="72" y="92" width="22" height="22" rx="4" fill="url(#pmMaroonRoll)" stroke="#450a0a" stroke-width="0.9"/>
+            <line class="pm-roll-ticks" x1="74" y1="103" x2="92" y2="103" stroke="#fca5a5" stroke-width="1.6" stroke-dasharray="4 4"/>
+            <rect x="40" y="84" width="28" height="28" rx="6" fill="url(#pmMaroonRoll)" stroke="#450a0a" stroke-width="1"/>
+            <line class="pm-roll-ticks" x1="43" y1="98" x2="65" y2="98" stroke="#fecaca" stroke-width="1.8" stroke-dasharray="5 4"/>
+            <rect x="6" y="122" width="96" height="12" rx="2" fill="#16a34a" stroke="#14532d" stroke-width="0.8"/>
+            <text x="54" y="131" text-anchor="middle" font-size="8.5" font-weight="900" fill="#ffffff" font-family="Segoe UI,Arial,sans-serif" letter-spacing="0.8">ICK</text>
+          </g>
+
+          <!-- Flow Arrow ICK -> MULTI 4 -->
+          <path d="M412 146 H396 M400 142.5 L395 146 L400 149.5" stroke="#8CF2C9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+
+          <!-- 2. TENGAH KANAN: MESIN MULTI 4 -->
+          <g transform="translate(292,14)">
+            <rect x="10" y="142" width="82" height="4" rx="1" fill="#1c2327"/>
+            <rect x="14" y="146" width="4" height="12" fill="#2a3439"/><rect x="84" y="146" width="4" height="12" fill="#2a3439"/>
+            <rect x="14" y="14" width="3" height="6" fill="#263238"/>
+            <rect x="12" y="4" width="7" height="3.5" rx="0.8" fill="#D93025"/>
+            <rect x="12" y="7.5" width="7" height="3.5" rx="0.8" fill="#F9AB00"/>
+            <rect x="12" y="11" width="7" height="3.5" rx="0.8" fill="#18C964" class="pm-tower-green"/>
+            <rect x="6" y="20" width="90" height="22" rx="2" fill="url(#pmCabTop)" stroke="#C98400" stroke-width="0.8"/>
+            <rect x="6" y="43" width="90" height="99" rx="2" fill="url(#pmCabYellow)" stroke="#C98400" stroke-width="0.8"/>
+            <line x1="48" y1="43" x2="48" y2="142" stroke="#A66D00" stroke-width="1"/>
+            <g transform="translate(29,124) rotate(-90)"><text x="0" y="0" font-size="14" font-weight="900" fill="#fff" stroke="#1C252C" stroke-width="0.6" font-family="Segoe UI,Arial,sans-serif">multi 4</text></g>
+            <rect x="54" y="54" width="36" height="38" rx="2.5" fill="#171E24" stroke="#2D3842" stroke-width="0.9"/>
+            <rect x="57" y="58" width="30" height="18" rx="1" fill="#111827"/>
+            <circle cx="72" cy="67" r="6" stroke="#E2E8F0" stroke-width="1" fill="none"/>
+            <circle cx="72" cy="67" r="3.2" stroke="#10B981" stroke-width="1.2" fill="none" class="pm-scan-beam-d"/>
+            <circle cx="64" cy="84" r="2" fill="#22C55E"/><circle cx="72" cy="84" r="2.6" fill="#DC2626"/><circle cx="80" cy="84" r="2" fill="#3B82F6"/>
+            <text x="72" y="34" text-anchor="middle" font-size="7.5" font-weight="900" fill="#182228" font-family="Segoe UI,Arial,sans-serif">TIAMA</text>
+          </g>
+
+          <!-- Flow Arrow MULTI 4 -> MCAL 4 -->
+          <path d="M286 146 H270 M274 142.5 L269 146 L274 149.5" stroke="#8CF2C9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+
+          <!-- 3. TENGAH KIRI: MESIN MCAL 4 -->
+          <g transform="translate(166,14)">
+            <rect x="10" y="142" width="82" height="4" rx="1" fill="#1c2327"/>
+            <rect x="14" y="146" width="4" height="12" fill="#2a3439"/><rect x="84" y="146" width="4" height="12" fill="#2a3439"/>
+            <rect x="14" y="14" width="3" height="6" fill="#263238"/>
+            <rect x="12" y="4" width="7" height="3.5" rx="0.8" fill="#D93025"/>
+            <rect x="12" y="7.5" width="7" height="3.5" rx="0.8" fill="#F9AB00"/>
+            <rect x="12" y="11" width="7" height="3.5" rx="0.8" fill="#18C964" class="pm-tower-green"/>
+            <rect x="6" y="20" width="90" height="22" rx="2" fill="url(#pmCabTop)" stroke="#C98400" stroke-width="0.8"/>
+            <rect x="6" y="43" width="90" height="99" rx="2" fill="url(#pmCabYellow)" stroke="#C98400" stroke-width="0.8"/>
+            <line x1="48" y1="43" x2="48" y2="142" stroke="#A66D00" stroke-width="1"/>
+            <g transform="translate(29,122) rotate(-90)"><text x="0" y="0" font-size="14" font-weight="900" fill="#fff" stroke="#1C252C" stroke-width="0.6" font-family="Segoe UI,Arial,sans-serif">mcal 4</text></g>
+            <rect x="54" y="54" width="36" height="38" rx="2.5" fill="#171E24" stroke="#2D3842" stroke-width="0.9"/>
+            <rect x="57" y="58" width="30" height="18" rx="1" fill="#F4F7F9"/>
+            <path d="M71 61 H73 V64.5 C73 65.5 74.5 66.5 74.5 68 V74 H69.5 V68 C69.5 66.5 71 65.5 71 64.5 Z" fill="#455A64"/>
+            <line x1="63" y1="68" x2="81" y2="68" stroke="#10B981" stroke-width="1.3" class="pm-scan-beam"/>
+            <circle cx="64" cy="84" r="2" fill="#38BDF8"/><circle cx="72" cy="84" r="2.6" fill="#DC2626"/><circle cx="80" cy="84" r="2" fill="#F97316"/>
+            <text x="72" y="34" text-anchor="middle" font-size="7.5" font-weight="900" fill="#182228" font-family="Segoe UI,Arial,sans-serif">TIAMA</text>
+          </g>
+
+          <!-- Flow Arrow MCAL 4 -> FP -->
+          <path d="M160 146 H144 M148 142.5 L143 146 L148 149.5" stroke="#8CF2C9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+
+          <!-- 4. PALING KIRI: MESIN FP (Rotary + Red Sensor Glow) -->
+          <g transform="translate(14,12)">
+            <rect x="10" y="22" width="116" height="82" rx="5" fill="#11161d" stroke="#334155" stroke-width="1.3"/>
+            <rect x="30" y="6" width="28" height="16" rx="2" fill="#e2e8f0" stroke="#475569" stroke-width="1"/>
+            <circle cx="38" cy="14" r="2" fill="#dc2626"/><circle cx="46" cy="14" r="2" fill="#1e293b"/>
+            <rect x="62" y="8" width="16" height="14" rx="2" fill="#1e293b" stroke="#94a3b8" stroke-width="0.9"/>
+            <rect x="82" y="6" width="28" height="16" rx="2" fill="#e2e8f0" stroke="#475569" stroke-width="1"/>
+            <ellipse class="pm-fp-aura" cx="68" cy="64" rx="44" ry="28" fill="url(#pmFpRedGlow)"/>
+            <ellipse cx="68" cy="48" rx="26" ry="5.5" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4 3" fill="none"/>
+            <ellipse cx="68" cy="78" rx="26" ry="6" fill="#1e293b" fill-opacity="0.6" stroke="#64748b" stroke-width="1.2"/>
+            <circle class="pm-red-1" cx="46" cy="64" r="3.4" fill="#ff2a2a"/><circle class="pm-red-2" cx="68" cy="62" r="4.2" fill="#ff1e1e"/><circle class="pm-red-1" cx="90" cy="64" r="3.4" fill="#ff2a2a"/>
+            <circle cx="68" cy="62" r="1.8" fill="#ffffff"/>
+            <rect x="14" y="106" width="34" height="32" rx="2.5" fill="url(#pmStainless)" stroke="#334155" stroke-width="1.1"/>
+            <rect x="20" y="122" width="22" height="9" rx="1.5" fill="#0284c7"/><text x="31" y="128.5" text-anchor="middle" fill="#fff" font-size="4.6" font-weight="900" font-family="Arial">TRIPLE</text>
+            <rect x="51" y="106" width="34" height="32" rx="2.5" fill="url(#pmStainless)" stroke="#334155" stroke-width="1.1"/>
+            <rect x="57" y="122" width="22" height="9" rx="1.5" fill="#e11d48"/><text x="68" y="128.5" text-anchor="middle" fill="#fff" font-size="4.6" font-weight="900" font-family="Arial">CHECK</text>
+            <rect x="88" y="106" width="34" height="32" rx="2.5" fill="url(#pmStainless)" stroke="#334155" stroke-width="1.1"/>
+            <rect x="94" y="122" width="22" height="9" rx="1.5" fill="#0284c7"/><text x="105" y="128.5" text-anchor="middle" fill="#fff" font-size="4.6" font-weight="900" font-family="Arial">FP</text>
+            <rect x="14" y="140" width="108" height="18" rx="2" fill="#18202c" stroke="#475569" stroke-width="1.2"/>
+            <text x="68" y="152" text-anchor="middle" fill="#91e0c2" font-size="8.5" font-weight="900" font-family="Segoe UI,Arial,sans-serif" letter-spacing="1.2">FP MACHINE</text>
+          </g>
+        </svg>
+      </section>
+
       <div id="pmAlertBanner" class="alert-banner" hidden></div>
 
       <div class="kpi-grid">
@@ -514,6 +696,26 @@
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let BOOT = { todayWib: '', lines: {}, defaultParts: [], customParts: [], allParts: [], schedules: [], logs: [], counts: { total: 0, overdue: 0, dueSoon: 0, ok: 0, alertCount: 0 } };
   let toastTimer = null;
+
+  const PM_BOTTLE_PALETTES = {
+    green: ['#15803d', '#4ade80', '#166534', '#052e16'],
+    amber: ['#451a03', '#d97706', '#78350f', '#270e02'],
+    flint: ['#64748b', '#f8fafc', '#94a3b8', '#334155']
+  };
+  window.setPmHeroBottle = (colorKey) => {
+    const cols = PM_BOTTLE_PALETTES[colorKey] || PM_BOTTLE_PALETTES.amber;
+    if ($('pm_bCol1')) $('pm_bCol1').setAttribute('stop-color', cols[0]);
+    if ($('pm_bCol2')) $('pm_bCol2').setAttribute('stop-color', cols[1]);
+    if ($('pm_bCol3')) $('pm_bCol3').setAttribute('stop-color', cols[2]);
+    if ($('pm_bCol4')) $('pm_bCol4').setAttribute('stop-color', cols[3]);
+    document.querySelectorAll('[data-pm-bottle]').forEach(btn => btn.classList.toggle('active', btn.dataset.pmBottle === colorKey));
+  };
+  window.setPmHeroSpeed = (val) => {
+    const num = Math.max(0.5, Math.min(4.0, Number(val) || 1.2));
+    const str = num.toFixed(1) + 's';
+    if ($('pmHeroSection')) $('pmHeroSection').style.setProperty('--hero-speed', str);
+    if ($('pmHeroSpeedVal')) $('pmHeroSpeedVal').textContent = str;
+  };
 
   function showToast(msg) {
     const t = $('toast');
